@@ -1,0 +1,27 @@
+{
+  "name": "wacz-uploader",
+  "version": "1.0.0",
+  "description": "A straightforward single page application for uploading your WACZ archives to IPFS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "standard --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webrecorder/wacz-uploader.git"
+  },
+  "author": "rangermauve <ranger@mauve.moe> (https://mauve.moe/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/webrecorder/wacz-uploader/issues"
+  },
+  "homepage": "https://github.com/webrecorder/wacz-uploader#readme",
+  "devDependencies": {
+    "standard": "^17.0.0"
+  },
+  "dependencies": {
+    "@ipld/dag-pb": "^2.1.18",
+    "ipfs-unixfs": "^7.0.0"
+  }
+}
