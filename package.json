@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "A straightforward single page application for uploading your WACZ archives to IPFS",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "standard --fix"
+    "lint": "standard --fix",
+    "build": "esbuild index.js --bundle --outfile=bundle.js --format=esm"
   },
   "repository": {
     "type": "git",
@@ -18,10 +20,13 @@
   },
   "homepage": "https://github.com/webrecorder/wacz-uploader#readme",
   "devDependencies": {
+    "esbuild": "^0.15.10",
     "standard": "^17.0.0"
   },
   "dependencies": {
+    "@ipld/car": "^4.1.6",
     "@ipld/dag-pb": "^2.1.18",
+    "auto-js-ipfs": "^1.3.10",
     "ipfs-unixfs": "^7.0.0"
   }
 }
