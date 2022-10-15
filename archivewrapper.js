@@ -1,8 +1,8 @@
-import { UnixFS } from "ipfs-unixfs";
-import CarWriter from '@ipld/car/writer'
+/* global Blob */
+import { CarWriter } from '@ipld/car/writer'
 
-import {CID} from "multiformats/cid"
-import * as Block from "multiformats/block"
+import { CID } from 'multiformats/cid'
+import * as Block from 'multiformats/block'
 
 import * as DagPB from '@ipld/dag-pb'
 import { sha256 } from 'multiformats/hashes/sha2'
@@ -75,22 +75,29 @@ export class ArchiveWrapper extends EventTarget {
   async uploadFiles (fileList) {
     try {
       this.dispatchEvent(new UploadStartEvent())
+      console.log('start uploading files', fileList)
 
       const results = await Promise.allSettled([...fileList]
         .map((file) => this.uploadFile(file))
       )
+
+      console.log('Building up archive Map')
 
       const archiveMap = new Map()
 
       for (const { status, value, reason } of results) {
         if (status === 'rejected') throw reason
         const { url, name, size } = value
-        archiveMap.set(name, {url, size, name})
+        archiveMap.set(name, { url, size, name })
       }
+
+      console.log('Wrapping with template')
 
       const url = await this.wrapArchives(archiveMap)
 
       this.dispatchEvent(new UploadFinishEvent(url))
+
+      console.log('Finished', url)
 
       return url
     } catch (e) {
@@ -103,11 +110,16 @@ export class ArchiveWrapper extends EventTarget {
     const { name } = file
     try {
       this.dispatchEvent(new UploadFileStartEvent(file))
+      console.log('Uploading', file, this.ipfs, name)
 
       // TODO: Chunking here!
       const url = await this.ipfs.uploadFile(file)
+
+      console.log('Uploaded, getting metadata')
       // Also ends up preloading the file into IPFS gateways for us
       const size = await this.ipfs.getSize(url)
+
+      console.log('Got size and metadata', size, url)
 
       this.dispatchEvent(new UploadFileFinishEvent(file, url))
 
@@ -121,7 +133,7 @@ export class ArchiveWrapper extends EventTarget {
   async wrapArchives (archiveMap) {
     const root = await this.getTemplateRoot()
 
-    for (const [name, {url, size}] of archiveMap) {
+    for (const [name, { url, size }] of archiveMap) {
       this.addLink(root, name, url, size)
     }
 
@@ -136,13 +148,13 @@ export class ArchiveWrapper extends EventTarget {
 
     // Encode to block
     const block = Block.encode({
-      value:prepared,
-      codec: DagPB
+      value: prepared,
+      codec: DagPB,
       hasher: sha256
     })
 
     // Create CarWriter
-    const {writer, out} = await CarWriter.create([block.cid])
+    const { writer, out } = await CarWriter.create([block.cid])
 
     // Put block into writer
     writer.put(block)
@@ -160,19 +172,18 @@ export class ArchiveWrapper extends EventTarget {
     // Get the raw block
     const toFetch = new URL(this.templateURL)
     toFetch.searchParams.set('format', 'raw')
-    const block = await this.ipfs.getFile(toFetch.href)
+    const block = await collectBuffer(this.ipfs.get(toFetch.href))
 
-    const decoded = decode(block)
+    const decoded = DagPB.decode(block)
 
     return decoded
-
   }
 
   addLink (dirNode, name, url, size) {
     const cidString = url.slice('ipfs://'.length).split('/')[0]
     const cid = CID.parse(cidString)
-    const existing = dirNode.Links.find(({Name}) => Name === name)
-    if(existing) {
+    const existing = dirNode.Links.find(({ Name }) => Name === name)
+    if (existing) {
       existing.Hash = cid
       existing.Tsize = size
     } else {
@@ -187,4 +198,15 @@ export class ArchiveWrapper extends EventTarget {
 
 function throwError (message) {
   throw new Error(message)
+}
+
+async function collectBuffer (iterator) {
+  const chunks = []
+  for await (const chunk of iterator) {
+    chunks.push(chunk)
+  }
+
+  const blob = new Blob(chunks)
+
+  return blob.arrayBuffer()
 }
