@@ -7,7 +7,8 @@ import * as Block from 'multiformats/block'
 import * as DagPB from '@ipld/dag-pb'
 import { sha256 } from 'multiformats/hashes/sha2'
 
-const DEFAULT_TEMPLATE = 'ipfs://example/'
+const DEFAULT_TEMPLATE = 'ipfs://bafybeiaqxlrvmovkiiniojnsy67fnfagddb2ml67ejbjcqgqyccedaegxi/'
+const ARCHIVES_INDEX_NAME = 'archives.json'
 
 export class UploadFileStartEvent extends Event {
   constructor (file) {
@@ -75,13 +76,10 @@ export class ArchiveWrapper extends EventTarget {
   async uploadFiles (fileList) {
     try {
       this.dispatchEvent(new UploadStartEvent())
-      console.log('start uploading files', fileList)
 
       const results = await Promise.allSettled([...fileList]
         .map((file) => this.uploadFile(file))
       )
-
-      console.log('Building up archive Map')
 
       const archiveMap = new Map()
 
@@ -91,13 +89,9 @@ export class ArchiveWrapper extends EventTarget {
         archiveMap.set(name, { url, size, name })
       }
 
-      console.log('Wrapping with template')
-
       const url = await this.wrapArchives(archiveMap)
 
       this.dispatchEvent(new UploadFinishEvent(url))
-
-      console.log('Finished', url)
 
       return url
     } catch (e) {
@@ -133,9 +127,18 @@ export class ArchiveWrapper extends EventTarget {
   async wrapArchives (archiveMap) {
     const root = await this.getTemplateRoot()
 
+    const archives = []
+
     for (const [name, { url, size }] of archiveMap) {
       this.addLink(root, name, url, size)
+      archives.push({ name, url })
     }
+
+    const archivesJSON = JSON.stringify({ archives }, null, '\t')
+
+    const { url, size } = await this.uploadFile(archivesJSON)
+
+    this.addLink(root, ARCHIVES_INDEX_NAME, url, size)
 
     const resultURL = await this.saveRoot(root)
 
@@ -147,7 +150,7 @@ export class ArchiveWrapper extends EventTarget {
     const prepared = DagPB.prepare(rootNode)
 
     // Encode to block
-    const block = Block.encode({
+    const block = await Block.encode({
       value: prepared,
       codec: DagPB,
       hasher: sha256
@@ -155,16 +158,18 @@ export class ArchiveWrapper extends EventTarget {
 
     // Create CarWriter
     const { writer, out } = await CarWriter.create([block.cid])
+    const onBuffer = collectBuffer(out)
 
     // Put block into writer
-    writer.put(block)
-    writer.close()
+    await writer.put({
+      cid: block.cid,
+      bytes: block.bytes
+    })
+    await writer.close()
 
     // Upload CAR to IPFS
-    await this.ipfs.uploadCAR(out)
+    const [url] = await this.ipfs.uploadCAR(await onBuffer)
 
-    // Return block CID as URL
-    const url = `ipfs://${block.cid}/`
     return url
   }
 
@@ -172,7 +177,8 @@ export class ArchiveWrapper extends EventTarget {
     // Get the raw block
     const toFetch = new URL(this.templateURL)
     toFetch.searchParams.set('format', 'raw')
-    const block = await collectBuffer(this.ipfs.get(toFetch.href))
+    const blockBuffer = await collectBuffer(this.ipfs.get(toFetch.href))
+    const block = new Uint8Array(blockBuffer)
 
     const decoded = DagPB.decode(block)
 
