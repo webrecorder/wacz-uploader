@@ -1,18 +1,25 @@
 /* global localStorage */
 import { ArchiveWrapper } from './archivewrapper.js'
 import { create } from 'auto-js-ipfs'
+import { WEB3_STORAGE_TOKEN } from './config.js'
 
 const PERSIST_KEY = 'wacz-archives'
 
 log('Initializing IPFS')
 
-const { api: ipfs } = await create()
+const { api: ipfs } = await create({
+  web3StorageToken: WEB3_STORAGE_TOKEN
+})
 
 const wrapper = new ArchiveWrapper({
   ipfs
 })
 
-window.dropzone.addEventListener('ondragdrop', (e) => {
+window.dropzone.addEventListener('dragover', (e) => {
+  e.preventDefault()
+})
+
+window.dropzone.addEventListener('drop', (e) => {
   wrapper.uploadFromDropEvent(e)
 })
 
@@ -25,7 +32,7 @@ wrapper.addEventListener('uploadstart', () => {
 })
 
 wrapper.addEventListener('uploadfinish', ({ url }) => {
-  log('Finished: ' + url)
+  log('Done: Generated page at ' + url)
   if (saveResult(url)) {
     addResult(url)
   }
