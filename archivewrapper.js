@@ -7,8 +7,8 @@ import * as Block from 'multiformats/block'
 import * as DagPB from '@ipld/dag-pb'
 import { sha256 } from 'multiformats/hashes/sha2'
 
-const DEFAULT_TEMPLATE = 'ipfs://bafybeiaqxlrvmovkiiniojnsy67fnfagddb2ml67ejbjcqgqyccedaegxi/'
-const ARCHIVES_INDEX_NAME = 'archives.json'
+const DEFAULT_TEMPLATE = 'ipfs://bafybeidyjwp67p35dfsxigti2iz4ho4qmv2vli7ufcn5z7prlzxh3abnzy/'
+const ARCHIVES_INDEX_NAME = 'wrg-runtime-config.json'
 
 export class UploadFileStartEvent extends Event {
   constructor (file) {
