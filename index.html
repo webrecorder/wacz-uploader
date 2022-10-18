@@ -5,30 +5,47 @@
   html {
     background: #FAFAFA;
   }
+
   * {
     box-sizing: border-box;
   }
+
   #fileInput {
-    border: none;
-    border-radius: 1em;
-    font-size: inherit;
-    padding: 0.5em;
+  display: none;
   }
+  #dropzone {
+    margin: 1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+    border-radius: 0.5em;
+    padding: 1em 0.5em;
+  }
+
   #statuslog {
     margin: 1em;
-    border: 1px solid black;
-    border-radius: 1em;
-    padding: 1em;
+    padding: 0.5em;
   }
+  #statuslog p {
+    margin: 0px;
+  }
+  #statuslog p::before {
+    content: "▶ "
+  }
+
   #resultzone {
     display: flex;
     flex-direction: column;
   }
 </style>
+<section id="resultzone">
+<p>Past uploads:</p>
+</section>
 <label id="dropzone">
+  Click here or drop some files.
   <input type="file" id="fileInput">
 </label>
 <section id="statuslog"></section>
-<section id="resultzone"></section>
 
 <script type="module" src="./bundle.js"></script>
