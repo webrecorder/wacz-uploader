@@ -1,0 +1,50 @@
+@import url('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/themes/light.css');
+
+:root {
+  --title-font-size: 2rem;
+}
+
+html {
+  font-size: 16px;
+  font-family: var(--sl-font-sans);
+  background-color: #fafbfc; /* TODO find matching color token */
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+sl-card {
+  width: 100%;
+}
+
+.title {
+  font-family: var(--sl-font-sans);
+  font-size: var(--title-font-size);
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: var(--sl-spacing-small);
+  line-height: 1;
+}
+
+.app {
+  margin: var(--sl-spacing-small);
+  max-width: 100%;
+  width: 1000px;
+}
+
+.app-content::part(base) {
+  height: calc(100vh - var(--title-font-size) - var(--sl-spacing-small) * 3);
+  max-height: 33rem;
+}
+
+@media only screen and (min-height: 33rem) {
+  body {
+    align-items: center;
+  }
+}
