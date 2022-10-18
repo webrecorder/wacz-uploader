@@ -35,6 +35,10 @@ sl-card {
   font-size: var(--title-font-size);
 }
 
+.subtitle {
+  line-height: 1.3;
+}
+
 .app {
   margin: var(--sl-spacing-small);
   max-width: 100%;
