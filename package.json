@@ -26,7 +26,7 @@
   "dependencies": {
     "@ipld/car": "^4.1.6",
     "@ipld/dag-pb": "^2.1.18",
-    "auto-js-ipfs": "^1.3.10",
+    "auto-js-ipfs": "^1.3.11",
     "ipfs-unixfs": "^7.0.0"
   }
 }
