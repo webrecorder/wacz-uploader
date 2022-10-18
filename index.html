@@ -45,17 +45,24 @@
       }
     </style>
     <article class="app">
-      <h1 class="title">WACZ Uploader</h1>
+      <h1 class="heading title">WACZ Uploader</h1>
 
       <sl-card class="app-content">
-        <section id="resultzone">
-          <p>Past uploads:</p>
+        <section>
+          <section id="resultzone">
+            <p>Past uploads:</p>
+          </section>
+          <label id="dropzone">
+            Click here or drop some files.
+            <input type="file" id="fileInput" />
+          </label>
+          <section id="statuslog"></section>
         </section>
-        <label id="dropzone">
-          Click here or drop some files.
-          <input type="file" id="fileInput" />
-        </label>
-        <section id="statuslog"></section>
+        <section>
+          <h2 class="heading">
+            Create and host a collection of web archives on IPFS
+          </h2>
+        </section>
       </sl-card>
     </article>
 

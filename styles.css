@@ -12,6 +12,7 @@ html {
 
 body {
   display: flex;
+  align-items: var(--app-vertical-align, flex-start);
   justify-content: center;
   margin: 0;
   width: 100vw;
@@ -23,13 +24,15 @@ sl-card {
   width: 100%;
 }
 
-.title {
-  font-family: var(--sl-font-sans);
-  font-size: var(--title-font-size);
+.heading {
   font-weight: 600;
   margin-top: 0;
   margin-bottom: var(--sl-spacing-small);
   line-height: 1;
+}
+
+.title {
+  font-size: var(--title-font-size);
 }
 
 .app {
@@ -43,8 +46,20 @@ sl-card {
   max-height: 33rem;
 }
 
+.app-content::part(body) {
+  display: grid;
+  grid-gap: var(--sl-spacing-medium);
+  grid-template-columns: repeat(var(--app-content-columns, 1), 1fr);
+}
+
 @media only screen and (min-height: 33rem) {
   body {
-    align-items: center;
+    --app-vertical-align: center;
+  }
+}
+
+@media only screen and (min-width: 1000px) {
+  .app-content {
+    --app-content-columns: 2;
   }
 }
