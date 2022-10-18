@@ -22,4 +22,8 @@ Start the dev server:
 npm run serve
 ```
 
-As a shorthand, you can `npm run dev` to build the JS bundle before starting the server.
+Start dev server and watch changes in bundled JS:
+
+```
+npm run dev
+```
