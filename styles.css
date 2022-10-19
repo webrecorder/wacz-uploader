@@ -1,0 +1,103 @@
+@import url('https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/themes/light.css');
+
+:root {
+  --title-font-size: 2rem;
+}
+
+html {
+  font-size: 16px;
+  font-family: var(--sl-font-sans);
+  background-color: #fafbfc; /* TODO find matching color token */
+}
+
+body {
+  display: flex;
+  align-items: var(--app-vertical-align, flex-start);
+  justify-content: center;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+@media only screen and (min-height: 33rem) {
+  body {
+    --app-vertical-align: center;
+  }
+}
+
+sl-card {
+  width: 100%;
+}
+
+.heading {
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: var(--sl-spacing-small);
+  line-height: 1;
+}
+
+.title {
+  font-size: var(--title-font-size);
+}
+
+.subtitle {
+  line-height: 1.3;
+}
+
+.app {
+  margin: var(--sl-spacing-small);
+  max-width: 100%;
+  width: 1000px;
+}
+
+.app-content::part(base) {
+  height: calc(100vh - var(--title-font-size) - var(--sl-spacing-small) * 3);
+  max-height: 33rem;
+}
+
+.app-content::part(body) {
+  display: grid;
+  grid-gap: var(--sl-spacing-medium);
+  grid-template-columns: repeat(var(--app-content-columns, 1), 1fr);
+}
+
+@media only screen and (min-width: 1000px) {
+  .app-content {
+    --app-content-columns: 2;
+  }
+  
+  .app-content-header {
+    /* Reverse order of header and body */
+    order: 1;
+  }
+}
+
+#fileInput {
+  display: none;
+}
+#dropzone {
+  margin: 1em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid black;
+  border-radius: 0.5em;
+  padding: 1em 0.5em;
+}
+
+#statuslog {
+  margin: 1em;
+  padding: 0.5em;
+}
+#statuslog p {
+  margin: 0px;
+}
+#statuslog p::before {
+  content: '▶ ';
+}
+
+#resultzone {
+  display: flex;
+  flex-direction: column;
+}
