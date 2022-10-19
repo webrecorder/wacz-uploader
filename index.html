@@ -15,18 +15,28 @@
       <h2 class="heading subtitle">
         Create and host a collection of web archives on IPFS
       </h2>
+      <p class="help-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eget sagittis netus odio nibh. Posuere facilisis aliquam maecenas sed scelerisque tortor. Tincidunt nibh vel ultricies lorem tincidunt nunc erat amet. Quis risus volutpat, venenatis amet.</p>
     </header>
     <div class="app-content-body">
-      <section id="resultzone">
-        <p>Past uploads:</p>
-      </section>
       <label id="dropzone">
-        Click here or drop some files.
-        <input type="file" id="fileInput" />
+        <div class="dropzone-label">Click here or drop some files.</div>
+        <p class="dropzone-help-text">
+          Multiple .wacz files will be combined into a single browsable site
+        </p>
+        <input type="file" id="fileInput" accept=".wacz,.warc" />
       </label>
-      <section id="statuslog"></section>
     </div>
   </sl-card>
+</article>
+<article>
+  <div>
+    <section id="resultzone">
+      <p>Past uploads:</p>
+    </section>
+  </div>
+  <div>
+    <section id="statuslog"></section>
+  </div>
 </article>
 
 <script type="module" src="./vendor.js"></script>
