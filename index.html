@@ -1,72 +1,69 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
-    <title>WACZ Uploader</title>
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <style>
-      * {
-        box-sizing: border-box;
-      }
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>WACZ Uploader</title>
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<style>
+  * {
+    box-sizing: border-box;
+  }
 
-      #fileInput {
-        display: none;
-      }
-      #dropzone {
-        margin: 1em;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: 1px solid black;
-        border-radius: 0.5em;
-        padding: 1em 0.5em;
-      }
+  #fileInput {
+    display: none;
+  }
+  #dropzone {
+    margin: 1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+    border-radius: 0.5em;
+    padding: 1em 0.5em;
+  }
 
-      #statuslog {
-        margin: 1em;
-        padding: 0.5em;
-      }
-      #statuslog p {
-        margin: 0px;
-      }
-      #statuslog p::before {
-        content: '▶ ';
-      }
+  #statuslog {
+    margin: 1em;
+    padding: 0.5em;
+  }
+  #statuslog p {
+    margin: 0px;
+  }
+  #statuslog p::before {
+    content: '▶ ';
+  }
 
-      #resultzone {
-        display: flex;
-        flex-direction: column;
-      }
-    </style>
-    <article class="app">
-      <h1 class="heading title">WACZ Uploader</h1>
+  #resultzone {
+    display: flex;
+    flex-direction: column;
+  }
+</style>
+<article class="app">
+  <h1 class="heading title">WACZ Uploader</h1>
 
-      <sl-card class="app-content">
-        <section>
-          <section id="resultzone">
-            <p>Past uploads:</p>
-          </section>
-          <label id="dropzone">
-            Click here or drop some files.
-            <input type="file" id="fileInput" />
-          </label>
-          <section id="statuslog"></section>
-        </section>
-        <section>
-          <h2 class="heading subtitle">
-            Create and host a collection of web archives on IPFS
-          </h2>
-        </section>
-      </sl-card>
-    </article>
+  <sl-card class="app-content">
+    <section>
+      <section id="resultzone">
+        <p>Past uploads:</p>
+      </section>
+      <label id="dropzone">
+        Click here or drop some files.
+        <input type="file" id="fileInput" />
+      </label>
+      <section id="statuslog"></section>
+    </section>
+    <section>
+      <h2 class="heading subtitle">
+        Create and host a collection of web archives on IPFS
+      </h2>
+    </section>
+  </sl-card>
+</article>
 
-    <script type="module" src="./vendor.js"></script>
-    <script type="module" src="./bundle.js"></script>
-  </body>
+<script type="module" src="./vendor.js"></script>
+<script type="module" src="./bundle.js"></script>
+</body>
 </html>
