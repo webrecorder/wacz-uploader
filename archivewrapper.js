@@ -7,7 +7,7 @@ import * as Block from 'multiformats/block'
 import * as DagPB from '@ipld/dag-pb'
 import { sha256 } from 'multiformats/hashes/sha2'
 
-const DEFAULT_TEMPLATE = 'ipfs://bafybeigba4lrgdnuopyu4ay44obzbzn55bailxvoaywwxqupmhvlhmxlny/'
+const DEFAULT_TEMPLATE = 'ipfs://bafybeihrupxyvw4tqdi4voy3olmhstmrosxjgfwyjtknaxzh27t5sa6zkm/'
 const ARCHIVES_INDEX_NAME = 'wrg-runtime-config.json'
 
 export class UploadFileStartEvent extends Event {
@@ -175,9 +175,14 @@ export class ArchiveWrapper extends EventTarget {
 
   async getTemplateRoot () {
     // Get the raw block
-    const toFetch = new URL(this.templateURL)
-    toFetch.searchParams.set('format', 'raw')
-    const blockBuffer = await collectBuffer(this.ipfs.get(toFetch.href))
+    // Note that some gateways don't support the `format` functionality
+    // For details check the Block/Car section of these gateways:
+    // https://ipfs.github.io/public-gateway-checker/
+    const blockBuffer = await collectBuffer(
+      this.ipfs.get(this.templateURL, {
+        format: 'raw'
+      })
+    )
     const block = new Uint8Array(blockBuffer)
 
     const decoded = DagPB.decode(block)
