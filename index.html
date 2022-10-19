@@ -10,12 +10,22 @@
 <article class="app">
   <h1 class="heading title">WACZ Uploader</h1>
 
-  <sl-card class="app-content">
+  <main class="card app-content">
     <header class="app-content-header">
       <h2 class="heading subtitle">
         Create and host a collection of web archives on IPFS
       </h2>
       <p class="help-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eget sagittis netus odio nibh. Posuere facilisis aliquam maecenas sed scelerisque tortor. Tincidunt nibh vel ultricies lorem tincidunt nunc erat amet. Quis risus volutpat, venenatis amet.</p>
+
+      <details>
+        <summary>DEBUG: Past uploads:</summary>
+        <section id="resultzone"></section>
+      </details>
+
+      <details>
+        <summary>DEBUG: status log</summary>
+        <section id="statuslog"></section>
+      </details>
     </header>
     <div class="app-content-body">
       <label id="dropzone">
@@ -23,20 +33,10 @@
         <p class="dropzone-help-text">
           Multiple .wacz files will be combined into a single browsable site
         </p>
-        <input type="file" id="fileInput" accept=".wacz,.warc" />
+        <input type="file" id="fileInput" />
       </label>
-    </div>
-  </sl-card>
-</article>
-<article>
-  <div>
-    <section id="resultzone">
-      <p>Past uploads:</p>
-    </section>
-  </div>
-  <div>
-    <section id="statuslog"></section>
-  </div>
+    </main>
+  </card>
 </article>
 
 <script type="module" src="./vendor.js"></script>
