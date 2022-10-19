@@ -20,6 +20,12 @@ body {
   overflow: hidden;
 }
 
+@media only screen and (min-height: 33rem) {
+  body {
+    --app-vertical-align: center;
+  }
+}
+
 sl-card {
   width: 100%;
 }
@@ -56,15 +62,14 @@ sl-card {
   grid-template-columns: repeat(var(--app-content-columns, 1), 1fr);
 }
 
-@media only screen and (min-height: 33rem) {
-  body {
-    --app-vertical-align: center;
-  }
-}
-
 @media only screen and (min-width: 1000px) {
   .app-content {
     --app-content-columns: 2;
+  }
+  
+  .app-content-header {
+    /* Reverse order of header and body */
+    order: 1;
   }
 }
 
