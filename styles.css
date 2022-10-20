@@ -14,34 +14,66 @@ html {
 }
 
 body {
-  display: flex;
-  align-items: var(--app-vertical-align, flex-start);
-  justify-content: center;
   margin: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
   background-color: #fafbfc; /* TODO find matching color token */
 }
 
+button {
+  all: unset;
+  background-color: var(--sl-color-blue-500);
+  color: #fff;
+  border-radius: .25rem;
+}
+
+.app-container {
+  display: flex;
+  align-items: var(--app-vertical-align, flex-start);
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+}
+
 @media only screen and (min-height: 33rem) {
-  body {
+  .app-container {
     --app-vertical-align: center;
   }
 }
 
-.card {
-  width: 100%;
+.panel {
   border: 1px solid var(--sl-panel-border-color);
   border-radius: .5rem;
-  padding: var(--card-padding, 1rem);
+  width: 100%;
   background-color: #fff;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--card-padding, 1rem);
+  overflow: hidden;
 }
 
 @media only screen and (min-width: 1000px) {
   .card {
-    --card-padding: 2rem;
+    --card-padding: 1.5rem;
   }
+}
+
+.card-header,
+.card-footer {
+  flex: 0;
+}
+
+.card-body {
+  flex: 1;
+}
+
+.card-footer {
+  margin-top: 1rem;
+}
+
+.scrollable {outline: 1px solid red;
+  overflow: auto;
 }
 
 .heading {
@@ -61,8 +93,9 @@ body {
 }
 
 .help-text {
-  color: var(--sl-color-neutral-700);
+  color: var(--sl-color-neutral-600);
   font-size: .875rem;
+  font-weight: normal;
   line-height: 1.5rem;
 }
 
@@ -78,11 +111,13 @@ body {
   grid-template-columns: repeat(var(--app-content-columns, 1), 1fr);
   height: calc(100vh - var(--title-font-size) - var(--sl-spacing-small) * 3);
   max-height: 33rem;
+ 
 }
 
 @media only screen and (min-width: 1000px) {
   .app-content {
     --app-content-columns: 2;
+    padding: 2rem;
   }
   
   .app-content-header {
@@ -99,6 +134,22 @@ body {
   .app-content-header {
     --header-padding: 1.5rem;
   }
+}
+
+.file-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.file-list-item {
+  border: 1px solid var(--sl-panel-border-color);
+  border-radius: .25rem;
+  padding: .5rem;
+}
+
+.file-list-item:not(:last-child) {
+  margin-bottom: .5rem;
 }
 
 #fileInput {

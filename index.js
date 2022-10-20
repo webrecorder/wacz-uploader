@@ -29,6 +29,8 @@ window.fileInput.addEventListener('change', (e) => {
 
 wrapper.addEventListener('uploadstart', () => {
   log('Starting upload')
+
+  // TODO change screen
 })
 
 wrapper.addEventListener('uploadfinish', ({ url }) => {

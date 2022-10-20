@@ -7,11 +7,15 @@
 <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
+<div class="app-container">
 <article class="app">
+  <div>
+    DEV: screen 1
+  </div>
   <h1 class="heading title">WACZ Uploader</h1>
 
-  <main class="card app-content">
-    <header class="app-content-header">
+  <main class="panel app-content">
+    <div class="app-content-header">
       <h2 class="heading subtitle">
         Create and host a collection of web archives on IPFS
       </h2>
@@ -26,8 +30,8 @@
         <summary>DEBUG: status log</summary>
         <section id="statuslog"></section>
       </details>
-    </header>
-    <div class="app-content-body">
+    </div>
+    <div>
       <label id="dropzone">
         <div class="dropzone-label">Click here or drop some files.</div>
         <p class="dropzone-help-text">
@@ -35,9 +39,58 @@
         </p>
         <input type="file" id="fileInput" />
       </label>
-    </main>
-  </card>
+    </div>
+  </main>
 </article>
+</div>
+
+<div class="app-container">
+  <article class="app">
+    <div>
+      DEV: screen 2
+    </div>
+    <h1 class="heading title">WACZ Uploader</h1>
+  
+    <main class="panel app-content">
+      <section class="panel card">
+        <div class="card-header">
+          <h2 class="heading subtitle">Add File Information</h2>
+          <h3 class="help-text">Files</h3>
+        </div>
+        <div class="card-body scrollable">
+          <ul class="file-list">
+            <li class="file-list-item">[NAME]</li>
+            <li class="file-list-item">[NAME]</li>
+            <li class="file-list-item">[NAME]</li>
+            <li class="file-list-item">[NAME]</li>
+            <li class="file-list-item">[NAME]</li>
+            <li class="file-list-item">[NAME]</li>
+            <li class="file-list-item">[NAME]</li>
+            <li class="file-list-item">[NAME]</li>
+            <li class="file-list-item">[NAME]</li>
+            <li class="file-list-item">[NAME]</li>
+            <li class="file-list-item">[NAME]</li>
+            <li class="file-list-item">[NAME]</li>
+            <li class="file-list-item">[NAME]</li>
+            <li class="file-list-item">[NAME]</li>
+          </ul>
+        </div>
+        <div class="card-footer">
+          <button>Continue</button>
+        </div>
+      </section>
+      <section class="panel card">
+        <article>
+          <h4 class="heading subtitle">[NAME]</h4>
+          <label>
+            <div>Description</div>
+            <textarea></textarea>
+          </label>
+        </article>
+      </section>
+    </main>
+  </article>
+  </div>
 
 <script type="module" src="./vendor.js"></script>
 <script type="module" src="./bundle.js"></script>
