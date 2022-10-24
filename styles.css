@@ -3,6 +3,7 @@
 :root {
   --title-font-size: 2rem;
   --sl-color-blue-500: #0366D6;
+  --sl-shadow-small: 0 1px 2px rgba(0,0,0,.15);
 }
 
 * {
@@ -21,16 +22,18 @@ body {
 
 button,
 input,
+select,
 textarea {
   all: unset;
   border-radius: .25rem;
+  box-sizing: border-box;
 }
 
 button {
   border-radius: .25rem;
   padding: 0 1.5rem;
   height: 2.5rem;
-  box-shadow: 0 1px 2px rgba(0,0,0,.15);
+  box-shadow: var(--sl-shadow-small);
   font-weight: 600;
 }
 
@@ -45,20 +48,34 @@ button:not(.primary) {
 }
 
 input,
+select,
 textarea {
   border: 1px solid var(--sl-panel-border-color);
+  color: var(--sl-color-gray-700);
+  font-size: var(--sl-font-size-small);
+  padding-left: .5rem;
+  padding-right: .5rem;
   width: 100%;
+}
+
+input,
+select {
+  height: 2rem;
+}
+
+select {
+  box-shadow: var(--sl-shadow-small);
 }
 
 textarea {
   height: 5rem;
-  padding: .5rem;
-  box-sizing: border-box;
+  padding-top: .5rem;
+  padding-bottom: .5rem;
 }
 
+input::placeholder,
 textarea::placeholder {
   color: var(--sl-color-gray-400);
-  font-size: var(--sl-font-size-small);
 }
 
 a {
@@ -73,6 +90,10 @@ a:active {
 
 .field {
   display: block;
+}
+
+.field:not(:last-child) {
+  margin-bottom: 1rem;
 }
 
 .app-container {
@@ -194,7 +215,7 @@ a:active {
 }
 
 .label-text {
-  color: var(--sl-color-gray-500);
+  color: var(--sl-color-gray-700);
   font-size: var(--sl-font-size-small);
   height: 1.5rem;
 }
