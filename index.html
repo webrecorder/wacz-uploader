@@ -142,6 +142,31 @@
 </div>
 
 <div class="app-container">
+<article class="app">
+  <div>
+    DEV: screen 4
+  </div>
+  <h1 class="heading title">WACZ Uploader</h1>
+
+  <main class="panel app-content">
+    <section class="panel card">
+      <div class="card-body incomplete-upload-warning">
+        <div>
+          <p class="heading subtitle">Some files didn’t upload properly</p>
+          <p class="heading text">Are you sure you want to continue?</p>
+          <p class="heading help-text">Incomplete uploads will not be present in the final website.</p>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button>Go back</button>
+        <button class="primary">Continue</button>
+      </div>
+    </section>
+  </main>
+</article>
+</div>
+
+<div class="app-container">
   <article class="app">
     <div>
       DEV: screen 3
@@ -150,16 +175,11 @@
   
     <main class="panel app-content">
       <section class="panel card">
-        <div class="card-body incomplete-upload-warning">
+        <div class="card-body upload-status-message">
           <div>
-            <p class="heading subtitle">Some files didn’t upload properly</p>
-          <p class="heading text">Are you sure you want to continue?</p>
-          <p class="heading help-text">Incomplete uploads will not be present in the final website.</p>
+            <sl-spinner></sl-spinner>
+            <p class="heading">Creating Website</p>
           </div>
-        </div>
-        <div class="card-footer">
-          <button>Go back</button>
-          <button class="primary">Continue</button>
         </div>
       </section>
     </main>

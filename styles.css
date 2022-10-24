@@ -283,11 +283,17 @@ textarea::placeholder {
   font-weight: 600;
 }
 
-.incomplete-upload-warning {
+.incomplete-upload-warning,
+.upload-status-message {
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
+}
+
+.upload-status-message sl-spinner {
+  font-size: 5rem;
+  margin-bottom: 1rem;
 }
 
 #statuslog {
