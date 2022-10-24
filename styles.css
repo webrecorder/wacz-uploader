@@ -2,6 +2,7 @@
 
 :root {
   --title-font-size: 2rem;
+  --sl-color-blue-500: #0366D6;
 }
 
 * {
@@ -18,11 +19,40 @@ body {
   background-color: #fafbfc; /* TODO find matching color token */
 }
 
-button {
+button,
+input,
+textarea {
   all: unset;
+  border-radius: .25rem;
+}
+
+button {
   background-color: var(--sl-color-blue-500);
   color: #fff;
   border-radius: .25rem;
+  padding: 0 1.5rem;
+  height: 2.5rem;
+}
+
+input,
+textarea {
+  border: 1px solid var(--sl-panel-border-color);
+  width: 100%;
+}
+
+textarea {
+  height: 5rem;
+  padding: .5rem;
+  box-sizing: border-box;
+}
+
+textarea::placeholder {
+  color: var(--sl-color-gray-400);
+  font-size: var(--sl-font-size-small);
+}
+
+.field {
+  display: block;
 }
 
 .app-container {
@@ -43,7 +73,7 @@ button {
   border: 1px solid var(--sl-panel-border-color);
   border-radius: .5rem;
   width: 100%;
-  background-color: #fff;
+  background-color: var(--sl-panel-background-color);
 }
 
 .card {
@@ -69,11 +99,45 @@ button {
 }
 
 .card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-top: 1rem;
 }
 
-.scrollable {outline: 1px solid red;
+.scrollable {
+  --scrollable-top-indicator-height: .5rem;
+  --scrollable-bottom-indicator-height: 1rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.scrollable:before,
+.scrollable:after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+.scrollable:before {
+  top: 0;
+  height: var(--scrollable-top-indicator-height);
+  background-image: linear-gradient(var(--sl-panel-background-color), rgba(255,255,255,0));
+}
+
+.scrollable:after {
+  bottom: 0;
+  height: var(--scrollable-bottom-indicator-height);
+  background-image: linear-gradient(rgba(255,255,255,0), var(--sl-panel-background-color));
+}
+
+.scroll-content {
   overflow: auto;
+  height: 100%;
+  padding: var(--scrollable-top-indicator-height) 0;
 }
 
 .heading {
@@ -92,11 +156,24 @@ button {
   line-height: 2rem;
 }
 
-.help-text {
-  color: var(--sl-color-neutral-600);
-  font-size: .875rem;
+.text {
+  color: var(--sl-color-gray-600);
+  font-size: var(--sl-font-size-small);
   font-weight: normal;
   line-height: 1.5rem;
+}
+
+.help-text {
+  color: var(--sl-color-gray-500);
+  font-size: var(--sl-font-size-x-small);
+  font-weight: normal;
+  line-height: 1rem;
+}
+
+.label-text {
+  color: var(--sl-color-gray-500);
+  font-size: var(--sl-font-size-small);
+  height: 1.5rem;
 }
 
 .app {
@@ -136,6 +213,12 @@ button {
   }
 }
 
+.file-list-heading {
+  margin: 0;
+  padding-bottom: .125rem;
+  border-bottom: 1px solid var(--sl-panel-border-color);
+}
+
 .file-list {
   list-style: none;
   margin: 0;
@@ -143,13 +226,23 @@ button {
 }
 
 .file-list-item {
+  display: grid;
+  grid-template-columns: min-content 1fr min-content;
+  grid-gap: .5rem;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--sl-panel-border-color);
   border-radius: .25rem;
   padding: .5rem;
+  line-height: 1;
 }
 
 .file-list-item:not(:last-child) {
   margin-bottom: .5rem;
+}
+
+.file-detail {
+  margin-bottom: 1rem;
 }
 
 #fileInput {
@@ -176,11 +269,6 @@ button {
 
 .dropzone-label {
   font-weight: 600;
-}
-
-.dropzone-help-text {
-  font-size: .75rem;
-  color: var(--sl-color-neutral-500);
 }
 
 #statuslog {

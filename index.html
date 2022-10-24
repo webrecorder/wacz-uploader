@@ -19,7 +19,7 @@
       <h2 class="heading subtitle">
         Create and host a collection of web archives on IPFS
       </h2>
-      <p class="help-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eget sagittis netus odio nibh. Posuere facilisis aliquam maecenas sed scelerisque tortor. Tincidunt nibh vel ultricies lorem tincidunt nunc erat amet. Quis risus volutpat, venenatis amet.</p>
+      <p class="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eget sagittis netus odio nibh. Posuere facilisis aliquam maecenas sed scelerisque tortor. Tincidunt nibh vel ultricies lorem tincidunt nunc erat amet. Quis risus volutpat, venenatis amet.</p>
 
       <details>
         <summary>DEBUG: Past uploads:</summary>
@@ -34,7 +34,7 @@
     <div>
       <label id="dropzone">
         <div class="dropzone-label">Click here or drop some files.</div>
-        <p class="dropzone-help-text">
+        <p class="help-text">
           Multiple .wacz files will be combined into a single browsable site
         </p>
         <input type="file" id="fileInput" />
@@ -55,38 +55,87 @@
       <section class="panel card">
         <div class="card-header">
           <h2 class="heading subtitle">Add File Information</h2>
-          <h3 class="help-text">Files</h3>
+          <h3 class="text file-list-heading">Files</h3>
         </div>
         <div class="card-body scrollable">
-          <ul class="file-list">
-            <li class="file-list-item">[NAME]</li>
-            <li class="file-list-item">[NAME]</li>
-            <li class="file-list-item">[NAME]</li>
-            <li class="file-list-item">[NAME]</li>
-            <li class="file-list-item">[NAME]</li>
-            <li class="file-list-item">[NAME]</li>
-            <li class="file-list-item">[NAME]</li>
-            <li class="file-list-item">[NAME]</li>
-            <li class="file-list-item">[NAME]</li>
-            <li class="file-list-item">[NAME]</li>
-            <li class="file-list-item">[NAME]</li>
-            <li class="file-list-item">[NAME]</li>
-            <li class="file-list-item">[NAME]</li>
-            <li class="file-list-item">[NAME]</li>
-          </ul>
+          <div class="scroll-content">
+            <ul class="file-list">
+              <li class="file-list-item">
+                <sl-spinner></sl-spinner>
+                <div>[NAME]</div>
+                <div class="help-text">
+                  [SIZE]
+                </div>
+              </li>
+              <li class="file-list-item">
+                <sl-spinner></sl-spinner>
+                <div>[NAME]</div>
+                <div class="help-text">
+                  [SIZE]
+                </div>
+              </li>
+              <li class="file-list-item">
+                <sl-spinner></sl-spinner>
+                <div>[NAME]</div>
+                <div class="help-text">
+                  [SIZE]
+                </div>
+              </li>
+              <li class="file-list-item">
+                <sl-spinner></sl-spinner>
+                <div>[NAME]</div>
+                <div class="help-text">
+                  [SIZE]
+                </div>
+              </li>
+              <li class="file-list-item">
+                <sl-spinner></sl-spinner>
+                <div>[NAME]</div>
+                <div class="help-text">
+                  [SIZE]
+                </div>
+              </li>
+            </ul>
+          </div>
         </div>
         <div class="card-footer">
+          <div>[MESSAGE]</div>
           <button>Continue</button>
         </div>
       </section>
       <section class="panel card">
-        <article>
-          <h4 class="heading subtitle">[NAME]</h4>
-          <label>
-            <div>Description</div>
-            <textarea></textarea>
-          </label>
-        </article>
+        <div class="card-body scrollable">
+          <div class="scroll-content">
+            <section class="file-detail">
+              <h4 class="heading subtitle">[NAME]</h4>
+              <label class="field">
+                <div class="label-text">Description</div>
+                <textarea placeholder="Add a short explanation of the file's contents"></textarea>
+              </label>
+            </section>
+            <section class="file-detail">
+              <h4 class="heading subtitle">[NAME]</h4>
+              <label class="field">
+                <div class="label-text">Description</div>
+                <textarea placeholder="Add a short explanation of the file's contents"></textarea>
+              </label>
+            </section>
+            <section class="file-detail">
+              <h4 class="heading subtitle">[NAME]</h4>
+              <label class="field">
+                <div class="label-text">Description</div>
+                <textarea placeholder="Add a short explanation of the file's contents"></textarea>
+              </label>
+            </section>
+            <section class="file-detail">
+              <h4 class="heading subtitle">[NAME]</h4>
+              <label class="field">
+                <div class="label-text">Description</div>
+                <textarea placeholder="Add a short explanation of the file's contents"></textarea>
+              </label>
+            </section>
+          </div>
+        </div>
       </section>
     </main>
   </article>
