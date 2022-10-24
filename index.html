@@ -144,7 +144,7 @@
 <div class="app-container">
 <article class="app">
   <div>
-    DEV: screen 4
+    DEV: screen 3
   </div>
   <h1 class="heading title">WACZ Uploader</h1>
 
@@ -152,9 +152,9 @@
     <section class="panel card">
       <div class="card-body incomplete-upload-warning">
         <div>
-          <p class="heading subtitle">Some files didn’t upload properly</p>
-          <p class="heading text">Are you sure you want to continue?</p>
-          <p class="heading help-text">Incomplete uploads will not be present in the final website.</p>
+          <p class="heading">Some files didn’t upload properly</p>
+          <p class="text">Are you sure you want to continue?</p>
+          <p class="text">Incomplete uploads will not be present in the final website.</p>
         </div>
       </div>
       <div class="card-footer">
@@ -167,24 +167,50 @@
 </div>
 
 <div class="app-container">
-  <article class="app">
-    <div>
-      DEV: screen 3
-    </div>
-    <h1 class="heading title">WACZ Uploader</h1>
-  
-    <main class="panel app-content">
-      <section class="panel card">
-        <div class="card-body upload-status-message">
+<article class="app">
+  <div>
+    DEV: screen 4
+  </div>
+  <h1 class="heading title">WACZ Uploader</h1>
+
+  <main class="panel app-content">
+    <section class="panel card">
+      <div class="card-body upload-status-message">
+        <div>
+          <sl-spinner></sl-spinner>
+          <div class="heading">Creating Website</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</article>
+</div>
+
+<div class="app-container">
+<article class="app">
+  <div>
+    DEV: screen 5
+  </div>
+  <h1 class="heading title">WACZ Uploader</h1>
+
+  <main class="panel app-content">
+    <section class="panel card">
+      <div class="card-body upload-status-message">
+        <div>
+          <div class="heading subtitle">Success!</div>
+          <p class="text">Your archive is available at:</p>
+          <div class="heading">
+            <a href="#" target="_blank" rel="noreferrer noopener">ipfs://HFIWRY274I2OLEWFHBWUYI3OW</a>
+          </div>
           <div>
-            <sl-spinner></sl-spinner>
-            <p class="heading">Creating Website</p>
+            <button class="primary">Create Another</button>
           </div>
         </div>
-      </section>
-    </main>
-  </article>
-  </div>
+      </div>
+    </section>
+  </main>
+</article>
+</div>
 
 <script type="module" src="./vendor.js"></script>
 <script type="module" src="./bundle.js"></script>

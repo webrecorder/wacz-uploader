@@ -61,6 +61,16 @@ textarea::placeholder {
   font-size: var(--sl-font-size-small);
 }
 
+a {
+  color: var(--sl-color-blue-500);
+  text-decoration: none;
+}
+
+a:hover,
+a:active {
+  text-decoration: underline;
+}
+
 .field {
   display: block;
 }
@@ -171,6 +181,8 @@ textarea::placeholder {
   font-size: var(--sl-font-size-small);
   font-weight: normal;
   line-height: 1.5rem;
+  margin-top: 0;
+  margin-bottom: .375rem;
 }
 
 .help-text {
@@ -178,6 +190,7 @@ textarea::placeholder {
   font-size: var(--sl-font-size-x-small);
   font-weight: normal;
   line-height: 1rem;
+  margin: 0;
 }
 
 .label-text {
@@ -292,8 +305,12 @@ textarea::placeholder {
 }
 
 .upload-status-message sl-spinner {
-  font-size: 5rem;
-  margin-bottom: 1rem;
+  font-size: 6rem;
+  margin-bottom: 1.5rem;
+}
+
+.upload-status-message button.primary {
+  margin-top: 1rem;
 }
 
 #statuslog {
