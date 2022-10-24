@@ -27,11 +27,21 @@ textarea {
 }
 
 button {
-  background-color: var(--sl-color-blue-500);
-  color: #fff;
   border-radius: .25rem;
   padding: 0 1.5rem;
   height: 2.5rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,.15);
+  font-weight: 600;
+}
+
+button.primary {
+  background-color: var(--sl-color-blue-500);
+  color: #fff;
+}
+
+button:not(.primary) {
+  color: var(--sl-color-gray-600);
+  outline: 1px solid var(--sl-panel-border-color);
 }
 
 input,
@@ -188,16 +198,18 @@ textarea::placeholder {
   grid-template-columns: repeat(var(--app-content-columns, 1), 1fr);
   height: calc(100vh - var(--title-font-size) - var(--sl-spacing-small) * 3);
   max-height: 33rem;
- 
 }
 
 @media only screen and (min-width: 1000px) {
   .app-content {
-    --app-content-columns: 2;
     padding: 2rem;
   }
+
+  .app-content-2-col {
+    --app-content-columns: 2;
+  }
   
-  .app-content-header {
+  .app-content-2-col .app-content-header {
     /* Reverse order of header and body */
     order: 1;
   }
@@ -269,6 +281,13 @@ textarea::placeholder {
 
 .dropzone-label {
   font-weight: 600;
+}
+
+.incomplete-upload-warning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 #statuslog {
