@@ -31,8 +31,6 @@ textarea {
 
 button {
   border-radius: .25rem;
-  padding: 0 1.5rem;
-  height: 2.5rem;
   box-shadow: var(--sl-shadow-small);
   font-weight: 600;
   cursor: pointer;
@@ -43,6 +41,33 @@ button:not(:disabled):hover {
   opacity: .8;
 }
 
+button:not(.icon-btn) {
+  height: 2.5rem;
+  padding: 0 1.5rem;
+}
+
+button.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+button.icon-btn.danger {
+  background-color: var(--sl-color-danger-50);
+  color: var(--sl-color-danger-600);
+}
+
+button.icon-btn.danger:hover {
+  background-color: var(--sl-color-danger-200);
+}
+
+button:not(.primary):not(.danger) {
+  color: var(--sl-color-gray-600);
+  outline: 1px solid var(--sl-panel-border-color);
+}
+
 button.primary {
   background-color: var(--sl-color-blue-500);
   color: #fff;
@@ -51,11 +76,6 @@ button.primary {
 button.primary:disabled {
   background-color: var(--sl-color-gray-300); 
   cursor: not-allowed;
-}
-
-button:not(.primary) {
-  color: var(--sl-color-gray-600);
-  outline: 1px solid var(--sl-panel-border-color);
 }
 
 input,
@@ -105,6 +125,10 @@ a:active {
 
 .field:not(:last-child) {
   margin-bottom: 1rem;
+}
+
+.hidden {
+  display: none !important;
 }
 
 .app-container {
@@ -285,7 +309,7 @@ a:active {
 
 .file-list-item {
   display: grid;
-  grid-template-columns: min-content 1fr max-content;
+  grid-template-columns: min-content 1fr max-content max-content;
   grid-gap: .5rem;
   align-items: center;
   justify-content: center;
@@ -293,6 +317,12 @@ a:active {
   border-radius: .25rem;
   padding: .5rem;
   line-height: 1;
+  transition: box-shadow .15s, transform .15s;
+}
+
+.file-list-item:hover {
+  box-shadow: var(--sl-shadow-small);
+  transform: translate3d(0, -2px, 0);
 }
 
 .file-list-item:not(:last-child) {

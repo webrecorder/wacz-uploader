@@ -64,6 +64,29 @@ export class App {
         },
       },
       on: {
+        REMOVE_FILE: {
+          actions: [
+            assign({
+              fileList: (ctx, evt) => ctx.fileList.filter(file => file.name !== evt.file.name),
+              fileRejected: (ctx, evt) => {
+                const {[evt.file.name]: throwaway, ...without} = ctx.fileRejected
+                return without
+              },
+              fileUploaded: (ctx, evt) => {
+                const {[evt.file.name]: throwaway, ...without} = ctx.fileRejected
+                return without
+              },
+              filesToWrap: (ctx, evt) => {
+                if (ctx.filesToWrap instanceof Map) {
+                  ctx.filesToWrap.remove(evt.file.name)
+                return ctx.filesToWrap
+                }
+                return ctx.filesToWrap
+              },
+            }),
+            (ctx, evt) => this.renderDeletedFile(evt),
+          ]
+        },
         FILE_UPLOAD_START: {
           actions: (ctx, evt) => this.renderFileStart(evt)
         },
@@ -188,6 +211,9 @@ export class App {
     listItem.querySelector('li').setAttribute('data-name', file.name)
     listItem.querySelector('.name').innerText = file.name
     listItem.querySelector('.size').setAttribute('value', file.size)
+    listItem.querySelector('.delete-btn').addEventListener('click', () => {
+      this.stateService.send('REMOVE_FILE', { file })
+    })
     this.appRoot.querySelector('.file-list').appendChild(listItem)
   }
 
@@ -199,6 +225,11 @@ export class App {
   renderFileError({ file }) {
     const listItem = this.appRoot.querySelector(`.file-list-item[data-name="${file.name}"]`)
     listItem.querySelector('.status').innerHTML = '<sl-icon class="icon danger" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/exclamation-circle-fill.svg"></sl-icon>'
+  }
+
+  renderDeletedFile({ file }) {
+    const listItem = this.appRoot.querySelector(`.file-list-item[data-name="${file.name}"]`)
+    listItem.classList.add('hidden')
   }
 
   renderFileSuccess({ file }) {
