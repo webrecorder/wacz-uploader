@@ -37,20 +37,18 @@ window.fileInput.addEventListener('change', (e) => {
   wrapper.uploadFromFileInputEvent(e)
 })
 
-wrapper.addEventListener('uploadstart', () => {
-  log('Starting upload')
-
-  // TODO change screen
+wrapper.addEventListener('uploadsitestart', () => {
+  log('Starting wrapper upload')
 })
 
-wrapper.addEventListener('uploadfinish', ({ url }) => {
+wrapper.addEventListener('uploadsitefinish', ({ url }) => {
   log('Done: Generated page at ' + url)
   if (saveResult(url)) {
     addResult(url)
   }
 })
 
-wrapper.addEventListener('uploaderror', ({ error }) => {
+wrapper.addEventListener('uploadsiteerror', ({ error }) => {
   log(error.stack)
 })
 

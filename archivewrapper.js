@@ -33,22 +33,50 @@ export class UploadFileErrorEvent extends Event {
   }
 }
 
-export class UploadStartEvent extends Event {
-  constructor () {
-    super('uploadstart')
+export class UploadFileListStartEvent extends Event {
+  constructor (fileList) {
+    super('uploadfileliststart')
+    this.fileList = fileList
   }
 }
 
-export class UploadFinishEvent extends Event {
+export class UploadFileListFinishEvent extends Event {
+  /**
+   * @param {{ completed: Map; rejected: null | Map }}
+   */
+  constructor ({ completed, rejected }) {
+    super('uploadfilelistfinish')
+    this.completed = completed
+    this.rejected = rejected
+  }
+}
+
+export class UploadFileListErrorEvent extends Event {
+  constructor (error) {
+    super('uploadfilelisterror')
+    this.error = error
+  }
+}
+
+export class UploadSiteStartEvent extends Event {
+  /**
+   * @param {Map}
+   */
+  constructor () {
+    super('uploadsitestart')
+  }
+}
+
+export class UploadSiteFinishEvent extends Event {
   constructor (url) {
-    super('uploadfinish')
+    super('uploadsitefinish')
     this.url = url
   }
 }
 
-export class UploadErrorEvent extends Event {
+export class UploadSiteErrorEvent extends Event {
   constructor (error) {
-    super('uploaderror')
+    super('uploadsiteerror')
     this.error = error
   }
 }
@@ -73,29 +101,40 @@ export class ArchiveWrapper extends EventTarget {
     return this.uploadFiles(fileList)
   }
 
+  /**
+   * @param {File[]} fileList
+   * @returns {Map} Map of successfully uploaded files
+   */
   async uploadFiles (fileList) {
     try {
-      this.dispatchEvent(new UploadStartEvent())
+      this.dispatchEvent(new UploadFileListStartEvent([...fileList]))
 
       const results = await Promise.allSettled([...fileList]
         .map((file) => this.uploadFile(file))
       )
 
       const archiveMap = new Map()
+      let rejectedMap = null
 
       for (const { status, value, reason } of results) {
-        if (status === 'rejected') throw reason
         const { url, name, size } = value
-        archiveMap.set(name, { url, size, name })
+        if (status === 'rejected') {
+          console.debug(`uploadFiles ${name} rejected reason: ${reason}`)
+          rejectedMap = rejectedMap || new Map()
+          rejectedMap.set(name, { reason })
+        } else {
+          archiveMap.set(name, { url, size, name })
+        }
       }
 
-      const url = await this.wrapArchives(archiveMap)
+      this.dispatchEvent(new UploadFileListFinishEvent({
+        completed: archiveMap,
+        rejected: rejectedMap
+      }))
 
-      this.dispatchEvent(new UploadFinishEvent(url))
-
-      return url
+      return archiveMap
     } catch (e) {
-      this.dispatchEvent(new UploadErrorEvent(e))
+      this.dispatchEvent(new UploadFileListErrorEvent(e))
       throw e
     }
   }
@@ -120,6 +159,22 @@ export class ArchiveWrapper extends EventTarget {
       return { url, file, size, name }
     } catch (e) {
       this.dispatchEvent(new UploadFileErrorEvent(file))
+      throw e
+    }
+  }
+  /**
+   * @param {Map} archiveMap - Map of successfully uploaded files
+   * @returns {string} URL to archives website
+   */
+  async uploadWrappedArchives(archiveMap) {
+    try {
+      this.dispatchEvent(new UploadSiteStartEvent())
+      const url = await this.wrapArchives(archiveMap)
+      this.dispatchEvent(new UploadSiteFinishEvent(url))
+
+      return url
+    } catch (e) {
+      this.dispatchEvent(new UploadSiteErrorEvent(e))
       throw e
     }
   }

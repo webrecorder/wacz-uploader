@@ -6,110 +6,129 @@ import { createMachine, interpret, assign } from 'https://unpkg.com/xstate@4.33.
 // Context stored in app state
 const initialContext = {
   /**
-   * File[]
+   * Files being uploaded
+   * @type File[]
    */
-  files: [],
+  fileList: [],
   /**
-   * { [file.name]: boolean }
+   * @type { [file.name]: boolean }
    */
-  errored: {},
+  fileRejected: {},
   /**
-   * { [file.name]: boolean }
+   * @type { [file.name]: boolean }
    */
-  done: {},
+  fileUploaded: {},
+  /**
+   * Files to wrap into website and upload
+   * @type (Map | null)
+   */
+  filesToWrap: null,
 }
 
 export class App {
   appRoot = null
+  wrapperService = null
   stateService = null
+  // xstate state configuration
+  // Common args:
+  //  ctx: context (.context object)
+  //  evt: event (passed through from `ArchiveWrapper` events)
   states = {
     default: {
       entry: () => this.renderInitial(),
-      on: { UPLOAD_START: 'uploading' },
+      on: {
+        UPLOAD_FILE_LIST_START: {
+          target: 'uploadingFileList',
+          actions: assign({ fileList: (ctx, { fileList }) => fileList}),
+        }
+      },
     },
-    uploading: {
-      entry: () => this.renderUploading(),
+    uploadingFileList: {
+      entry: (ctx) => this.renderUploading(ctx),
+      states: {
+        uploadIncomplete: {
+          entry: () => this.enableContinueBtn(),
+          on: {
+            CONTINUE: '#incompleteFileListUpload',
+          },
+        },
+        uploadComplete: {
+          entry: () => this.enableContinueBtn(),
+          on: {
+            CONTINUE: {
+              target: '#creatingSite',
+              actions: (ctx) => this.uploadSite(ctx),
+            },
+          },
+        },
+      },
       on: {
         FILE_UPLOAD_START: {
-          actions: [
-            assign({ files: (ctx, { file }) => ([ ...ctx.files, file ])}),
-            (ctx, evt) => {
-              this.renderFile(evt)
-              this.renderFileStart(evt)
-            }
-          ]
+          actions: (ctx, evt) => this.renderFileStart(evt)
         },
         FILE_UPLOAD_ERROR: {
           actions: [
-            assign({ errored: (ctx, { file }) => ({ ...ctx.errored, [file.name]: true })}),
+            assign({ fileRejected: (ctx, { file }) => ({ ...ctx.fileRejected, [file.name]: true })}),
             (ctx, evt) => this.renderFileError(evt)
           ]
         },
         FILE_UPLOAD_SUCCESS: {
           actions: [
-            assign({ done: (ctx, { file }) => ({ ...ctx.done, [file.name]: true })}),
+            assign({ fileUploaded: (ctx, { file }) => ({ ...ctx.fileUploaded, [file.name]: true })}),
             (ctx, evt) => this.renderFileSuccess(evt)
           ]
         },
-        UPLOAD_INCOMPLETE: {
-          target: 'uploadIncomplete',
-          actions: [
-            (ctx, evt) => this.renderErrorMessage(evt),
-            () => this.enableContinueBtn()
-          ],
+        UPLOAD_FILE_LIST_ERROR: {
+          actions: (ctx, evt) => this.renderErrorMessage(evt),
         },
-        UPLOAD_COMPLETE: {
-          target: 'uploadComplete',
-          actions: () => this.enableContinueBtn(),
-        },
+        UPLOAD_FILE_LIST_FINISH: [{
+          target: '.uploadIncomplete',
+          cond: (ctx, evt) => evt.rejected,
+        }, {
+          target: '.uploadComplete',
+          cond: (ctx, evt) => !evt.rejected,
+          actions: assign({ filesToWrap: (ctx, { completed }) => completed }),
+        }],
       },
     },
-    uploadIncomplete: {
-      on: {
-        CONTINUE: 'warnIncomplete',
-      },
-    },
-    uploadComplete: {
-      on: {
-        CONTINUE: 'creatingSite',
-      },
-    },
-    warnIncomplete: {
+    incompleteFileListUpload: {
+      id: 'incompleteFileListUpload',
       entry: () => this.renderIncompleteWarning(),
       on: {
         BACK: {
-          target: 'uploadIncomplete',
-          actions: [
-            () => this.renderUploading(),
-            () => this.enableContinueBtn(),
-            (ctx) => {
-              ctx.files.forEach(file => {
-                this.renderFile({ file })
-                
-                if (ctx.done[file.name]) {
-                  this.renderFileSuccess({ file })
-                } else if (ctx.errored[file.name]) {
-                  this.renderFileError({ file })
-                }
-              })
-            }
-          ],
+          target: 'uploadingFileList.uploadIncomplete',
         },
-        CONTINUE: 'creatingSite',
+        CONTINUE: {
+          target: 'creatingSite',
+          actions: (ctx) => this.uploadSite(ctx),
+        },
       },
     },
     creatingSite: {
+      id: 'creatingSite',
       entry: () => this.renderCreatingSite(),
-      on: { CREATE_SITE_COMPLETE: 'done' },
+      states: {
+        error: {
+          entry: (ctx, evt) => this.renderCreatingSiteError(evt),
+        }
+      },
+      on: {
+        UPLOAD_SITE_START: {
+          actions: () => console.debug('TODO handle UPLOAD_SITE_START'),
+        },
+        UPLOAD_SITE_ERROR: '.error',
+        UPLOAD_SITE_FINISH: 'done'
+      },
     },
     done: {
+      type: 'final',
       entry: (ctx, evt) => this.renderDone(evt),
-      on: {
-        RESTART: {
-          target: 'default',
-          actions: assign(initialContext),
-        },
-      },
+      // on: {
+      //   RESTART: {
+      //     target: 'default',
+      //     actions: assign(initialContext),
+      //   },
+      // },
     },
   }
 
@@ -118,51 +137,45 @@ export class App {
     this.stateService = interpret(createMachine({
       initial: 'default',
       predictableActionArguments: true,
-      preserveActionOrder: true,
       context: initialContext,
       states: this.states,
     }))
       .onTransition((state) => console.debug(state.value))
       .start()
+    this.wrapperService = {
+      uploadWrappedArchives: (...args) => wrapper.uploadWrappedArchives(...args),
+    }
 
     wrapper.addEventListener('uploadfilestart', (evt) => this.stateService.send('FILE_UPLOAD_START', evt))
     wrapper.addEventListener('uploadfilefinish', (evt) => this.stateService.send('FILE_UPLOAD_SUCCESS', evt))
     wrapper.addEventListener('uploadfileerror', (evt) => this.stateService.send('FILE_UPLOAD_ERROR', evt))
-    wrapper.addEventListener('uploadstart', (evt) => this.stateService.send('UPLOAD_START'))
-    wrapper.addEventListener('uploadfinish', (evt) => this.stateService.send('UPLOAD_COMPLETE'))
-    wrapper.addEventListener('uploaderror', (evt) => {
-      console.debug(evt.error)
-      this.stateService.send('UPLOAD_INCOMPLETE', { error: evt.error.message })
-    })
-
-    // window.setTimeout(() => {
-    //   this.stateService.send('UPLOAD_START')
-    //   const files = [new File([], 'temp 1'), new File([], 'temp 2'), new File([], 'temp 3')]
-    //   this.stateService.send('FILE_UPLOAD_START', { file: files[0] })
-    //   this.stateService.send('FILE_UPLOAD_START', { file: files[1] })
-    //   this.stateService.send('FILE_UPLOAD_START', { file: files[2]})
-
-    //   window.setTimeout(() => {
-    //     this.stateService.send('FILE_UPLOAD_SUCCESS', { file: files[0] })
-    //     // this.stateService.send('FILE_UPLOAD_SUCCESS', { file: files[1] })
-    //     this.stateService.send('FILE_UPLOAD_SUCCESS', { file: files[2] })
-    //     // this.stateService.send('UPLOAD_COMPLETE')
-    //     this.stateService.send('FILE_UPLOAD_ERROR', { file: files[1] })
-    //     this.stateService.send('UPLOAD_INCOMPLETE', { error: 'test' })
-    //   }, 500)
-      
-    // }, 100)
+    wrapper.addEventListener('uploadfileliststart', (evt) => this.stateService.send('UPLOAD_FILE_LIST_START', evt))
+    wrapper.addEventListener('uploadfilelistfinish', (evt) => this.stateService.send('UPLOAD_FILE_LIST_FINISH', evt))
+    wrapper.addEventListener('uploadfilelisterror', (evt) => this.stateService.send('UPLOAD_FILE_LIST_ERROR', evt))
+    wrapper.addEventListener('uploadsitestart', (evt) => this.stateService.send('UPLOAD_SITE_START', evt))
+    wrapper.addEventListener('uploadsitefinish', (evt) => this.stateService.send('UPLOAD_SITE_FINISH', evt))
+    wrapper.addEventListener('uploadsiteerror', (evt) => this.stateService.send('UPLOAD_SITE_ERROR', evt))
   }
 
   renderInitial() {
     console.debug('TODO renderInitial')
   }
 
-  renderUploading() {
+  renderUploading({ fileList, fileRejected, fileUploaded }) {
     const template = document.querySelector('#uploadProgressScreen')
     const section = template.content.cloneNode(true)
     this.appRoot.replaceChildren(section)
     this.appRoot.classList.remove('app-content-2-col')
+
+    fileList.forEach(file => {
+      this.renderFile({ file })
+
+      if (fileUploaded[file.name]) {
+        this.renderFileSuccess({ file })
+      } else if (fileRejected[file.name]) {
+        this.renderFileError({ file })
+      }
+    })
   }
 
   renderFile({ file }) {
@@ -207,6 +220,14 @@ export class App {
     this.appRoot.replaceChildren(section)
   }
 
+  renderCreatingSiteError({ error }) {
+    const template = document.querySelector('#creatingSiteErrorScreen')
+    const section = template.content.cloneNode(true)
+    const errorElem = section.querySelector('.error-message')
+    errorElem.innerText = error.message
+    this.appRoot.replaceChildren(section)
+  }
+
   renderDone({ url }) {
     const template = document.querySelector('#createSiteDoneScreen')
     const section = template.content.cloneNode(true)
@@ -223,7 +244,7 @@ export class App {
     const errorElem = this.appRoot.querySelector('.error-message')
 
     if (errorElem) {
-      errorElem.innerText = error
+      errorElem.innerText = error.message
     }
   }
 
@@ -233,5 +254,9 @@ export class App {
       this.stateService.send('CONTINUE')
     })
     btn.removeAttribute('disabled')
+  }
+
+  uploadSite({ filesToWrap }) {
+    this.wrapperService.uploadWrappedArchives(filesToWrap)
   }
 }
