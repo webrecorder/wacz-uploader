@@ -319,11 +319,11 @@ a:active {
 }
 
 .icon.danger {
-  background-image: url('./assets/danger-icon.svg');
+  color: var(--sl-color-danger-600);
 }
 
 .icon.success {
-  background-image: url('./assets/success-icon.svg');
+  color: var(--sl-color-success-600);
 }
 
 #fileInput {

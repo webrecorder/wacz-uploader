@@ -198,12 +198,12 @@ export class App {
 
   renderFileError({ file }) {
     const listItem = this.appRoot.querySelector(`.file-list-item[data-name="${file.name}"]`)
-    listItem.querySelector('.status').innerHTML = '<i class="icon danger"></i>'
+    listItem.querySelector('.status').innerHTML = '<sl-icon class="icon danger" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/exclamation-circle-fill.svg"></sl-icon>'
   }
 
   renderFileSuccess({ file }) {
     const listItem = this.appRoot.querySelector(`.file-list-item[data-name="${file.name}"]`)
-    listItem.querySelector('.status').innerHTML = '<i class="icon success"></i>'
+    listItem.querySelector('.status').innerHTML = '<sl-icon class="icon success" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/check-circle-fill.svg"></sl-icon>'
   }
 
   renderIncompleteWarning() {
