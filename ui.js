@@ -34,7 +34,7 @@ export class App {
   //  ctx: context (.context object)
   //  evt: event (passed through from `ArchiveWrapper` events)
   states = {
-    default: {
+    initial: {
       entry: () => this.renderInitial(),
       on: {
         UPLOAD_FILE_LIST_START: {
@@ -44,6 +44,7 @@ export class App {
       },
     },
     uploadingFileList: {
+      id: 'uploadingFileList',
       entry: (ctx) => this.renderUploading(ctx),
       states: {
         uploadIncomplete: {
@@ -110,6 +111,9 @@ export class App {
       states: {
         error: {
           entry: (ctx, evt) => this.renderCreatingSiteError(evt),
+          on: {
+            BACK: '#uploadingFileList.uploadComplete',
+          }
         }
       },
       on: {
@@ -125,7 +129,7 @@ export class App {
       entry: (ctx, evt) => this.renderDone(evt),
       // on: {
       //   RESTART: {
-      //     target: 'default',
+      //     target: 'initial',
       //     actions: assign(initialContext),
       //   },
       // },
@@ -135,7 +139,7 @@ export class App {
   constructor({ wrapper }) {
     this.appRoot = document.getElementById('appRoot')
     this.stateService = interpret(createMachine({
-      initial: 'default',
+      initial: 'initial',
       predictableActionArguments: true,
       context: initialContext,
       states: this.states,
@@ -225,6 +229,9 @@ export class App {
     const section = template.content.cloneNode(true)
     const errorElem = section.querySelector('.error-message')
     errorElem.innerText = error.message
+    section.querySelector('.back-btn').addEventListener('click', () => {
+      this.stateService.send('BACK')
+    })
     this.appRoot.replaceChildren(section)
   }
 
