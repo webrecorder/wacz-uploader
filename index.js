@@ -2,6 +2,7 @@
 import { ArchiveWrapper } from './archivewrapper.js'
 import { create } from 'auto-js-ipfs'
 import { WEB3_STORAGE_TOKEN } from './config.js'
+import { App } from './ui.js'
 
 const PERSIST_KEY = 'wacz-archives'
 
@@ -15,12 +16,21 @@ const wrapper = new ArchiveWrapper({
   ipfs
 })
 
+new App({ wrapper })
+
+window.dropzone.addEventListener('dragenter', (e) => {
+  if (!window.dropzone.contains(e.relatedTarget)) {
+    window.dropzone.querySelector('sl-animation').setAttribute('play', true)
+  }
+})
+
 window.dropzone.addEventListener('dragover', (e) => {
   e.preventDefault()
 })
 
 window.dropzone.addEventListener('drop', (e) => {
   wrapper.uploadFromDropEvent(e)
+  e.preventDefault()
 })
 
 window.fileInput.addEventListener('change', (e) => {
