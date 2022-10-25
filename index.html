@@ -12,39 +12,64 @@
 <body class="app-container">
 <article class="app">
   <h1 class="heading title">WACZ Uploader</h1>
-  <main id="appRoot" class="panel app-content app-content-2-col">
-    <div class="app-content-header card">
-      <div class="card-header">
-        <h2 class="heading subtitle">
-          Create and host a collection of web archives on IPFS
-        </h2>
-      </div>
-      <div class="card-body">
-        <p class="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eget sagittis netus odio nibh. Posuere
-          facilisis aliquam maecenas sed scelerisque tortor. Tincidunt nibh vel ultricies lorem tincidunt nunc erat amet. Quis
-          risus volutpat, venenatis amet.</p>
-      </div>
-      <div class="card-footer help-text">
-        <div>
-          Created by Webrecorder
+  <main class="panel scrollable">
+    <div id="appRoot" class="app-content app-content-2-col scroll-content">
+      <div class="app-content-header card">
+        <div class="card-header">
+          <h2 class="heading subtitle">
+            Create and host a collection of web archives on IPFS
+          </h2>
         </div>
-        <div>
-          <sl-icon class="icon" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/github.svg"></sl-icon> Source code
+        <div class="card-body">
+          <p class="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eget sagittis netus odio nibh. Posuere
+            facilisis aliquam maecenas sed scelerisque tortor. Tincidunt nibh vel ultricies lorem tincidunt nunc erat amet. Quis
+            risus volutpat, venenatis amet.</p>
         </div>
-      </div>
-    </div>
-    <div>
-      <label id="dropzone" class="animated-border">
-        <sl-animation name="pulse" iterations="1" playback-rate="2">
-          <div class="dropzone-content">
-            <div class="dropzone-label">Click here or drop some files.</div>
-            <p class="help-text">
-              Multiple .wacz files will be combined into a single browsable site
-            </p>
-            <input type="file" id="fileInput" multiple accept=".wacz,.warc" />
+        <div class="card-footer help-text">
+          <div>
+            Created by Webrecorder
           </div>
-        </sl-animation>
-      </label>
+          <div>
+            <sl-icon class="icon" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/github.svg"></sl-icon> Source code
+          </div>
+        </div>
+      </div>
+      <div class="file-upload-container">
+        <label id="dropzone">
+          <svg
+            class="file-upload-border"
+            xmlns="http://www.w3.org/2000/svg"
+            text-rendering="geometricPrecision"
+            shape-rendering="geometricPrecision"
+            height="100%"
+            width="100%"
+            viewBox="0 0 460 468"
+          >
+            <rect
+              class="animate-border"
+              transform="translate(2,2)"
+              stroke="#0366d6"
+              width="456"
+              height="464"
+              fill="none"
+              stroke-width="4"
+              stroke-linecap="round"
+              rx="8"
+              stroke-dasharray="24 24"
+              stroke-dashoffset="0"
+            />
+          </svg>
+          <sl-animation name="pulse" iterations="1" playback-rate="2">
+            <div class="dropzone-content">
+              <div class="dropzone-label">Click here or drop some files.</div>
+              <p class="help-text">
+                Multiple .wacz files will be combined into a single browsable site
+              </p>
+              <input type="file" id="fileInput" multiple accept=".wacz,.warc" />
+            </div>
+          </sl-animation>
+        </label>
+      </div>
     </div>
   </main>
 </article>
