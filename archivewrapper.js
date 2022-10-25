@@ -156,6 +156,14 @@ export class ArchiveWrapper extends EventTarget {
       hasher: sha256
     })
 
+    // This is needed because web3.storage requires a non-root block in CAR files
+    // Kind of a gross hack, but we can figure it out after they get back to us
+    const blocknt = await Block.encode({
+      value: DagPB.prepare({}),
+      codec: DagPB,
+      hasher: sha256
+    })
+
     // Create CarWriter
     const { writer, out } = await CarWriter.create([block.cid])
     const onBuffer = collectBuffer(out)
@@ -164,6 +172,10 @@ export class ArchiveWrapper extends EventTarget {
     await writer.put({
       cid: block.cid,
       bytes: block.bytes
+    })
+    await writer.put({
+      cid: blocknt.cid,
+      bytes: blocknt.bytes
     })
     await writer.close()
 
