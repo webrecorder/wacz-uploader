@@ -1,33 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>WACZ Uploader</title>
-<link rel="stylesheet" href="./styles.css" />
+<link rel="stylesheet" href="./styles.css"/>
+<link rel="preload" as="image" href="./assets/danger-icon.svg">
+<link rel="preload" as="image" href="./assets/success-icon.svg">
 </head>
-<body>
+<body class="app-container">
 <article class="app">
   <h1 class="heading title">WACZ Uploader</h1>
-
-  <sl-card class="app-content">
-    <header class="app-content-header">
-      <h2 class="heading subtitle">
-        Create and host a collection of web archives on IPFS
-      </h2>
-    </header>
-    <div class="app-content-body">
-      <section id="resultzone">
-        <p>Past uploads:</p>
-      </section>
-      <label id="dropzone">
-        Click here or drop some files.
-        <input type="file" id="fileInput" />
-      </label>
-      <section id="statuslog"></section>
+  <main id="appRoot" class="panel app-content app-content-2-col">
+    <div class="app-content-header card">
+      <div class="card-header">
+        <h2 class="heading subtitle">
+          Create and host a collection of web archives on IPFS
+        </h2>
+      </div>
+      <div class="card-body">
+        <p class="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eget sagittis netus odio nibh. Posuere
+          facilisis aliquam maecenas sed scelerisque tortor. Tincidunt nibh vel ultricies lorem tincidunt nunc erat amet. Quis
+          risus volutpat, venenatis amet.</p>
+      </div>
+      <div class="card-footer help-text">
+        <div>
+          Created by Webrecorder
+        </div>
+        <div>
+          Source code
+        </div>
+      </div>
     </div>
-  </sl-card>
+    <div>
+      <label id="dropzone" class="animated-border">
+        <sl-animation name="pulse" iterations="1" playback-rate="2">
+          <div class="dropzone-content">
+            <div class="dropzone-label">Click here or drop some files.</div>
+            <p class="help-text">
+              Multiple .wacz files will be combined into a single browsable site
+            </p>
+            <input type="file" id="fileInput" multiple/>
+          </div>
+        </sl-animation>
+      </label>
+    </div>
+  </main>
 </article>
+
+<div id="debug">
+  <details>
+    <summary>DEBUG: Past uploads:</summary>
+    <section id="resultzone"></section>
+  </details>
+  <details>
+    <summary>DEBUG: status log</summary>
+    <section id="statuslog"></section>
+  </details>
+</div>
+
+<template id="uploadProgressScreen">
+  <section class="panel card">
+    <div class="card-header">
+      <h2 class="heading subtitle">Upload in Progress</h2>
+      <h3 class="text file-list-heading">Files</h3>
+    </div>
+    <div class="card-body scrollable">
+      <div class="scroll-content">
+        <ul class="file-list"></ul>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="error-message"></div>
+      <button class="continue-btn primary" disabled autocomplete="false">Continue</button>
+    </div>
+  </section>
+  <!-- <section class="panel card">
+    <div class="card-body scrollable">
+      <div class="file-detail-list scroll-content"></div>
+    </div>
+  </section> -->
+</template>
+<template id="fileListItem">
+  <li class="file-list-item" data-name="">
+    <div class="status"></div>
+    <div class="name"></div>
+    <sl-format-bytes class="size help-text" value=""></sl-format-bytes>
+  </li>
+</template>
+<template id="fileDetailItem">
+  <section class="file-detail">
+    <h4 class="heading subtitle">[NAME]</h4>
+    <label class="field">
+      <div class="label-text">Description</div>
+      <textarea placeholder="Add a short explanation of the file's contents"></textarea>
+    </label>
+  </section>
+</template>
+<template id="incompleteWarningScreen">
+  <section class="panel card incomplete-warning">
+    <div class="card-body incomplete-message">
+      <div>
+        <p class="heading">Some files didn’t upload properly</p>
+        <p class="text">Are you sure you want to continue?</p>
+        <p class="text">Incomplete uploads will not be present in the final website.</p>
+      </div>
+    </div>
+    <div class="card-footer">
+      <button class="back-btn">Go Back</button>
+      <button class="continue-btn primary">Continue</button>
+    </div>
+  </section>
+</template>
+<template id="creatingSiteScreen">
+  <section class="panel card">
+    <div class="card-body upload-status-message">
+      <div>
+        <sl-spinner></sl-spinner>
+        <div class="heading">Creating Website</div>
+      </div>
+    </div>
+  </section>
+</template>
+<template id="createSiteDoneScreen">
+  <section class="panel card">
+    <div class="card-body upload-status-message">
+      <div>
+        <div class="heading subtitle">Success!</div>
+        <p class="text">Your archive is available at:</p>
+        <div class="heading">
+          <a class="site-url" href="#" target="_blank" rel="noreferrer noopener"></a>
+        </div>
+        <div>
+          <button class="restart-btn primary">Create Another</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+<template id="settingsPanel">
+  <section class="panel card">
+    <div class="card-header">
+      <h3 class="heading subtitle">Back-End Settings</h3>
+    </div>
+    <div class="card-body scrollable">
+      <form class="scroll-content">
+        <label class="field">
+          <div class="label-text">IPFS Backend</div>
+          <select>
+            <option value="">Webrecorder Default</option>
+          </select>
+        </label>
+        <label class="field">
+          <div class="label-text">Custom Web3.Storage Token</div>
+          <input placeholder="[EXAMPLE]"/>
+        </label>
+        <label class="field">
+          <div class="label-text">Custom Estuary Token</div>
+          <input placeholder="[EXAMPLE]"/>
+        </label>
+        <label class="field">
+          <div class="label-text">Personal Kubo Daemon URL</div>
+          <input placeholder="[EXAMPLE]"/>
+        </label>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button>Cancel</button>
+      <button class="primary">Save Settings</button>
+    </div>
+  </section>
+</template>
 
 <script type="module" src="./vendor.js"></script>
 <script type="module" src="./bundle.js"></script>
