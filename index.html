@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>WACZ Uploader</title>
 <link rel="stylesheet" href="./styles.css"/>
-<link rel="preload" as="image" href="./assets/danger-icon.svg">
-<link rel="preload" as="image" href="./assets/success-icon.svg">
 </head>
 <body class="app-container">
 <article class="app">
@@ -47,7 +45,6 @@
     </div>
   </main>
 </article>
-
 <div id="debug">
   <details>
     <summary>DEBUG: Past uploads:</summary>
@@ -58,7 +55,6 @@
     <section id="statuslog"></section>
   </details>
 </div>
-
 <template id="uploadProgressScreen">
   <section class="panel card">
     <div class="card-header">
@@ -75,11 +71,9 @@
       <button class="continue-btn primary" disabled autocomplete="false">Continue</button>
     </div>
   </section>
-  <!-- <section class="panel card">
-    <div class="card-body scrollable">
+  <!-- <section class="panel card"> <div class="card-body scrollable">
       <div class="file-detail-list scroll-content"></div>
-    </div>
-  </section> -->
+  </div> </section> -->
 </template>
 <template id="fileListItem">
   <li class="file-list-item" data-name="">
@@ -186,7 +180,6 @@
     </div>
   </section>
 </template>
-
 <script type="module" src="./vendor.js"></script>
 <script type="module" src="./bundle.js"></script>
 </body>
