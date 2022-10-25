@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>WACZ Uploader</title>
 <link rel="stylesheet" href="./styles.css"/>
+<link rel="preload" as="image" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/trash3.svg">
+<link rel="preload" as="image" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/exclamation-circle-fill.svg">
+<link rel="preload" as="image" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/check-circle-fill.svg">
 </head>
 <body class="app-container">
 <article class="app">
@@ -26,7 +29,7 @@
           Created by Webrecorder
         </div>
         <div>
-          Source code
+          <sl-icon class="icon" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/github.svg"></sl-icon> Source code
         </div>
       </div>
     </div>
@@ -38,7 +41,7 @@
             <p class="help-text">
               Multiple .wacz files will be combined into a single browsable site
             </p>
-            <input type="file" id="fileInput" multiple/>
+            <input type="file" id="fileInput" multiple accept=".wacz,.warc" />
           </div>
         </sl-animation>
       </label>
