@@ -18,6 +18,10 @@ const wrapper = new ArchiveWrapper({
 
 new App({ wrapper })
 
+if (window.location.search.includes('debug')) {
+  document.querySelector('#debug').classList.remove('hidden')
+}
+
 wrapper.addEventListener('uploadsitestart', () => {
   log('Starting wrapper upload')
 })
