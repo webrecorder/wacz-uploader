@@ -479,7 +479,7 @@ a.footer-link:active {
 }
 
 #dropzone .animate-border {
-  animation: 2s linear infinite both animated-border;
+  animation: 1s linear infinite both animated-border;
   animation-play-state: paused;
 }
 
