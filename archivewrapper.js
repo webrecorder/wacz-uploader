@@ -23,6 +23,13 @@ export class UploadFileStartEvent extends Event {
   }
 }
 
+export class UploadFileMetadataStartEvent extends Event {
+  constructor (file) {
+    super('uploadfilemetadatastart')
+    this.file = file
+  }
+}
+
 export class UploadFileFinishEvent extends Event {
   constructor (file, url) {
     super('uploadfilefinish')
@@ -188,6 +195,7 @@ export class ArchiveWrapper extends EventTarget {
       // TODO: Chunking here!
       const url = await this.ipfs.uploadFile(file)
 
+      this.dispatchEvent(new UploadFileMetadataStartEvent(file))
       console.log('Uploaded, getting metadata')
       // Also ends up preloading the file into IPFS gateways for us
       const size = await this.ipfs.getSize(url)
@@ -207,7 +215,7 @@ export class ArchiveWrapper extends EventTarget {
    * @returns {string} URL to archives website
    */
   async uploadWrappedArchives(archiveMap) {
-    console.debug({ archiveMap })
+    console.debug('Uploading archiveMap:', archiveMap)
     try {
       this.dispatchEvent(new UploadSiteStartEvent())
       const url = await this.wrapArchives(archiveMap)
