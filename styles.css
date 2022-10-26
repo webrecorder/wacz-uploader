@@ -31,7 +31,6 @@ textarea {
 
 button {
   border-radius: .25rem;
-  box-shadow: var(--sl-shadow-small);
   font-weight: 600;
   cursor: pointer;
   transition: opacity .15s, background-color .15s;
@@ -39,6 +38,11 @@ button {
 
 button:not(:disabled):hover {
   opacity: .8;
+}
+
+button:disabled {
+  background-color: var(--sl-color-gray-300) !important;
+  cursor: not-allowed;
 }
 
 button:not(.icon-btn) {
@@ -54,34 +58,50 @@ button.icon-btn {
   height: 1.5rem;
 }
 
-button.icon-btn.danger {
+button.danger {
+  box-shadow: var(--sl-shadow-small);
   background-color: var(--sl-color-danger-50);
   color: var(--sl-color-danger-600);
 }
 
-button.icon-btn.danger:hover {
+button.danger:hover {
   background-color: var(--sl-color-danger-200);
 }
 
-button:not(.primary):not(.danger) {
+button.default {
   color: var(--sl-color-gray-600);
-  outline: 1px solid var(--sl-panel-border-color);
+}
+
+button.default:not(.icon-btn) {
+  box-shadow: var(--sl-shadow-small);
+  outline: 1px solid var(--sl-input-border-color);
+}
+
+button.default.icon-btn:hover {
+  background-color: var(--sl-color-blue-50);
+  box-shadow: var(--sl-shadow-small);
 }
 
 button.primary {
+  box-shadow: var(--sl-shadow-small);
   background-color: var(--sl-color-blue-500);
   color: #fff;
 }
 
-button.primary:disabled {
-  background-color: var(--sl-color-gray-300); 
-  cursor: not-allowed;
+button.secondary {
+  box-shadow: var(--sl-shadow-small);
+  background-color: var(--sl-color-blue-50);
+  color: var(--sl-color-blue-500);
+}
+
+button.secondary:hover {
+  background-color: var(--sl-color-blue-100);
 }
 
 input,
 select,
 textarea {
-  border: 1px solid var(--sl-panel-border-color);
+  border: 1px solid var(--sl-input-border-color);
   color: var(--sl-color-gray-700);
   font-size: var(--sl-font-size-small);
   padding-left: .5rem;
@@ -96,6 +116,11 @@ select {
 
 select {
   box-shadow: var(--sl-shadow-small);
+}
+
+input,
+textarea {
+  cursor: text;
 }
 
 textarea {
@@ -266,7 +291,8 @@ a:active {
   display: grid;
   grid-gap: 1.5rem;
   grid-template-columns: repeat(var(--app-content-columns, 1), 1fr);
-  grid-template-rows: max-content;
+  grid-template-rows: auto;
+  /* grid-template-rows: max-content; */
   height: calc(100vh - var(--title-font-size) - var(--sl-spacing-small) * 3);
   max-height: 33rem;
 }
@@ -302,7 +328,11 @@ a:active {
   padding: 0;
 }
 
-.file-list-item {
+.file-list li:not(:last-child) {
+  margin-bottom: .5rem;
+}
+
+.file-info {
   display: grid;
   grid-template-columns: min-content 1fr max-content max-content;
   grid-gap: .5rem;
@@ -312,24 +342,74 @@ a:active {
   border-radius: .25rem;
   padding: .5rem;
   line-height: 1;
-  transition: box-shadow .15s, transform .15s;
 }
 
-.file-list-item:hover {
+.file-info[aria-disabled] {
+  cursor: not-allowed;
+}
+
+.file-info:not([aria-disabled]) {
+  transition: box-shadow .15s, transform .15s;
+  cursor: pointer;
+}
+
+.file-info:not([aria-disabled]):hover {
   box-shadow: var(--sl-shadow-small);
   transform: translate3d(0, -2px, 0);
 }
 
-.file-list-item:not(:last-child) {
-  margin-bottom: .5rem;
-}
-
-.file-list-item .icon {
+.file-info .icon {
   display: block;
 }
 
+.file-details-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.file-details-loading sl-spinner {
+  font-size: 2rem;
+  margin-bottom: .5rem;
+}
+
+.file-detail-list {
+  padding: 1rem;
+}
+
 .file-detail {
+  border-radius: .25rem;
+  padding: .5rem;
   margin-bottom: 1rem;
+  transition: background-color .5s
+}
+
+.file-detail.selected {
+  background-color: var(--sl-color-blue-50);
+}
+
+.file-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.file-detail-header .heading {
+  margin-bottom: 0;
+}
+
+.name-form {
+  display: flex;
+  align-items: center;
+  height: 2rem;
+}
+
+.name-input {
+  flex: 1;
+  margin-right: .5rem;
 }
 
 .error-message {

@@ -167,6 +167,7 @@ export class ArchiveWrapper extends EventTarget {
    * @returns {string} URL to archives website
    */
   async uploadWrappedArchives(archiveMap) {
+    console.debug({ archiveMap })
     try {
       this.dispatchEvent(new UploadSiteStartEvent())
       const url = await this.wrapArchives(archiveMap)
@@ -184,12 +185,14 @@ export class ArchiveWrapper extends EventTarget {
 
     const archives = []
 
-    for (const [name, { url, size }] of archiveMap) {
-      this.addLink(root, name, url, size)
-      archives.push({ name, url })
+    for (const [fileName, { name, url, size, description = "" }] of archiveMap) {
+      this.addLink(root, fileName, url, size)
+      archives.push({ name: name || fileName, url, description })
     }
 
     const archivesJSON = JSON.stringify({ archives }, null, '\t')
+
+    console.debug({ archivesJSON })
 
     const { url, size } = await this.uploadFile(archivesJSON)
 

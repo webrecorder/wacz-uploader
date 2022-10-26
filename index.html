@@ -5,9 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>WACZ Uploader</title>
 <link rel="stylesheet" href="./styles.css"/>
-<link rel="preload" as="image" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/trash3.svg">
-<link rel="preload" as="image" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/exclamation-circle-fill.svg">
-<link rel="preload" as="image" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/check-circle-fill.svg">
+<link
+  rel="preload"
+  as="image"
+  href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/trash3.svg">
+<link
+  rel="preload"
+  as="image"
+  href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/exclamation-circle-fill.svg">
+<link
+  rel="preload"
+  as="image"
+  href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/check-circle-fill.svg">
 </head>
 <body class="app-container">
 <article class="app">
@@ -30,7 +39,10 @@
             Created by Webrecorder
           </div>
           <div>
-            <sl-icon class="icon" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/github.svg"></sl-icon> Source code
+            <sl-icon
+              class="icon"
+              src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/github.svg"></sl-icon>
+            Source code
           </div>
         </div>
       </div>
@@ -43,8 +55,7 @@
             shape-rendering="geometricPrecision"
             height="100%"
             width="100%"
-            viewBox="0 0 460 468"
-          >
+            viewbox="0 0 460 468">
             <rect
               class="animate-border"
               transform="translate(2,2)"
@@ -56,8 +67,7 @@
               stroke-linecap="round"
               rx="8"
               stroke-dasharray="24 24"
-              stroke-dashoffset="0"
-            />
+              stroke-dashoffset="0"/>
           </svg>
           <sl-animation name="pulse" iterations="1" playback-rate="2">
             <div class="dropzone-content">
@@ -65,7 +75,7 @@
               <p class="help-text">
                 Multiple .wacz files will be combined into a single browsable site
               </p>
-              <input type="file" id="fileInput" multiple accept=".wacz,.warc" />
+              <input type="file" id="fileInput" multiple accept=".wacz,.warc"/>
             </div>
           </sl-animation>
         </label>
@@ -86,7 +96,7 @@
 <template id="uploadProgressScreen">
   <section class="panel card">
     <div class="card-header">
-      <h2 class="heading subtitle">Upload in Progress</h2>
+      <h2 class="heading subtitle">Add File Information</h2>
       <h3 class="text file-list-heading">Files</h3>
     </div>
     <div class="card-body scrollable">
@@ -99,23 +109,46 @@
       <button class="continue-btn primary" disabled autocomplete="false">Continue</button>
     </div>
   </section>
-  <!-- <section class="panel card"> <div class="card-body scrollable">
-      <div class="file-detail-list scroll-content"></div>
-  </div> </section> -->
+  <section class="panel scrollable">
+    <div class="file-details-loading">
+      <sl-spinner></sl-spinner>
+      <p class="help-text">Waiting for file details...</p>
+    </div>
+    <div class="file-detail-list scroll-content"></div>
+  </section>
 </template>
 <template id="fileListItem">
-  <li class="file-list-item" data-name="">
-    <div class="status"></div>
-    <div class="name"></div>
-    <sl-format-bytes class="size help-text" value=""></sl-format-bytes>
-    <button class="delete-btn icon-btn danger">
-      <sl-icon class="icon" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/trash3.svg"></sl-icon>
-    </button>
+  <li class="file-list-item" data-file-name="">
+    <div class="file-info" role="button">
+      <div class="status"></div>
+      <div class="name"></div>
+      <sl-format-bytes class="size help-text" value=""></sl-format-bytes>
+      <button class="delete-btn icon-btn danger">
+        <sl-icon
+          class="icon"
+          src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/trash3.svg"></sl-icon>
+      </button>
+    </div>
   </li>
 </template>
 <template id="fileDetailItem">
-  <section class="file-detail">
-    <h4 class="heading subtitle">[NAME]</h4>
+  <section class="file-detail" data-file-name="">
+    <header class="file-detail-header">
+      <h4 class="heading subtitle name"></h4>
+      <button class="edit-btn icon-btn default">
+        <sl-icon
+          class="icon"
+          src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/pencil.svg"></sl-icon>
+      </button>
+    </header>
+    <form class="name-form field hidden" autocomplete="off">
+      <input class="name-input" value=""/>
+      <button type="submit" class="save-btn icon-btn secondary">
+        <sl-icon
+          class="icon"
+          src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/check-lg.svg"></sl-icon>
+      </button>
+    </form>
     <label class="field">
       <div class="label-text">Description</div>
       <textarea placeholder="Add a short explanation of the file's contents"></textarea>
@@ -132,7 +165,7 @@
       </div>
     </div>
     <div class="card-footer">
-      <button class="back-btn">Go Back</button>
+      <button class="back-btn default">Go Back</button>
       <button class="continue-btn primary">Continue</button>
     </div>
   </section>
@@ -158,7 +191,7 @@
       </div>
     </div>
     <div class="card-footer">
-      <button class="back-btn">Go Back</button>
+      <button class="back-btn default">Go Back</button>
     </div>
   </section>
 </template>
@@ -206,7 +239,7 @@
       </form>
     </div>
     <div class="card-footer">
-      <button>Cancel</button>
+      <button class="default">Cancel</button>
       <button class="primary">Save Settings</button>
     </div>
   </section>

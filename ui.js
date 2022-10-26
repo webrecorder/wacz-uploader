@@ -6,23 +6,19 @@ import { createMachine, interpret, assign } from 'https://unpkg.com/xstate@4.33.
 // Context stored in app state
 const initialContext = {
   /**
-   * Files being uploaded
-   * @type File[]
+   * Files metadata
+   * Mapped by original file name (ID)
+   * @type {Map<string,{
+   *   name: string;
+   *   description: string;
+   *   url: string;
+   *   size: number;
+   *   file: File;
+   *   rejected: boolean;
+   *   completed: boolean;
+   * }>}
    */
-  fileList: [],
-  /**
-   * @type { [file.name]: boolean }
-   */
-  fileRejected: {},
-  /**
-   * @type { [file.name]: boolean }
-   */
-  fileUploaded: {},
-  /**
-   * Files to wrap into website and upload
-   * @type (Map | null)
-   */
-  filesToWrap: null,
+  fileMap: new Map(),
 }
 
 export class App {
@@ -39,7 +35,12 @@ export class App {
       on: {
         UPLOAD_FILE_LIST_START: {
           target: 'uploadingFileList',
-          actions: assign({ fileList: (ctx, { fileList }) => fileList}),
+          actions: assign({ fileMap: (ctx, { fileList }) => new Map(
+            fileList.map(file => ([
+              file.name,
+              { name: file.name, file }
+            ]))
+          )}),
         }
       },
     },
@@ -67,39 +68,67 @@ export class App {
         REMOVE_FILE: {
           actions: [
             assign({
-              fileList: (ctx, evt) => ctx.fileList.filter(file => file.name !== evt.file.name),
-              fileRejected: (ctx, evt) => {
-                const {[evt.file.name]: throwaway, ...without} = ctx.fileRejected
-                return without
-              },
-              fileUploaded: (ctx, evt) => {
-                const {[evt.file.name]: throwaway, ...without} = ctx.fileRejected
-                return without
-              },
-              filesToWrap: (ctx, evt) => {
-                if (ctx.filesToWrap instanceof Map) {
-                  ctx.filesToWrap.remove(evt.file.name)
-                return ctx.filesToWrap
-                }
-                return ctx.filesToWrap
+              fileMap: (ctx, { file }) => {
+                ctx.fileMap.delete(file.name)
+                return ctx.fileMap
               },
             }),
             (ctx, evt) => this.renderDeletedFile(evt),
           ]
+        },
+        UPDATE_FILE_NAME: {
+          actions: [
+            assign({
+              fileMap: (ctx, { name, file }) => {
+                const data = ctx.fileMap.get(file.name)
+                ctx.fileMap.set(file.name, { ...data, name })
+                return ctx.fileMap
+              },
+            }),
+            ({ fileMap }, { file }) => {
+              const data = fileMap.get(file.name)
+              this.renderFileNames(data)
+            },
+          ]
+        },
+        UPDATE_FILE_DESCRIPTION: {
+          actions: assign({
+            fileMap: (ctx, { file, description }) => {
+              const data = ctx.fileMap.get(file.name)
+              ctx.fileMap.set(file.name, { ...data, description })
+              return ctx.fileMap
+            },
+          }),
         },
         FILE_UPLOAD_START: {
           actions: (ctx, evt) => this.renderFileStart(evt)
         },
         FILE_UPLOAD_ERROR: {
           actions: [
-            assign({ fileRejected: (ctx, { file }) => ({ ...ctx.fileRejected, [file.name]: true })}),
+            assign({
+              fileMap: (ctx, { file }) => {
+                const data = ctx.fileMap.get(file.name)
+                ctx.fileMap.set(file.name, { ...data, rejected: true })
+                return ctx.fileMap
+              },
+            }),
             (ctx, evt) => this.renderFileError(evt)
           ]
         },
         FILE_UPLOAD_SUCCESS: {
           actions: [
-            assign({ fileUploaded: (ctx, { file }) => ({ ...ctx.fileUploaded, [file.name]: true })}),
-            (ctx, evt) => this.renderFileSuccess(evt)
+            assign({
+              fileMap: (ctx, { file }) => {
+                const data = ctx.fileMap.get(file.name)
+                ctx.fileMap.set(file.name, { ...data, completed: true })
+                return ctx.fileMap
+              },
+            }),
+            ({ fileMap }, { file }) => {
+              const data = fileMap.get(file.name)
+              this.renderFileSuccess(data)
+              this.renderFileDetail(data)
+            },
           ]
         },
         UPLOAD_FILE_LIST_ERROR: {
@@ -107,11 +136,23 @@ export class App {
         },
         UPLOAD_FILE_LIST_FINISH: [{
           target: '.uploadIncomplete',
-          cond: (ctx, evt) => evt.rejected,
+          cond: (ctx, evt) => evt.rejected && evt.rejected.size > 0,
         }, {
           target: '.uploadComplete',
-          cond: (ctx, evt) => !evt.rejected,
-          actions: assign({ filesToWrap: (ctx, { completed }) => completed }),
+          cond: (ctx, evt) => evt.completed && (!evt.rejected || evt.rejected.size === 0),
+          actions: assign({
+            fileMap: (ctx, { completed }) => {
+              const map = new Map(completed)
+              map.forEach((value, key) => {
+                const ctxValue = ctx.fileMap.get(key)
+                map.set(key, {
+                  ...ctxValue,
+                  ...value,
+                })
+              })
+              return map
+            }
+          }),
         }],
       },
     },
@@ -188,56 +229,111 @@ export class App {
     console.debug('TODO renderInitial')
   }
 
-  renderUploading({ fileList, fileRejected, fileUploaded }) {
+  renderUploading({ fileMap }) {
     const template = document.querySelector('#uploadProgressScreen')
     const section = template.content.cloneNode(true)
     this.appRoot.replaceChildren(section)
-    this.appRoot.classList.remove('app-content-2-col')
+    this.appRoot.classList.add('app-content-2-col')
 
-    fileList.forEach(file => {
-      this.renderFile({ file })
+    fileMap.forEach((value) => {
+      this.renderFile(value)
 
-      if (fileUploaded[file.name]) {
-        this.renderFileSuccess({ file })
-      } else if (fileRejected[file.name]) {
-        this.renderFileError({ file })
+      if (value.rejected) {
+        this.renderFileError(value)
+      } else {
+        this.renderFileSuccess(value)
+        // this.renderFileDetail(value)
       }
     })
   }
 
-  renderFile({ file }) {
+  renderFile({ name, size, file }) {
     const template = document.querySelector('#fileListItem')
     const listItem = template.content.cloneNode(true)
-    listItem.querySelector('li').setAttribute('data-name', file.name)
-    listItem.querySelector('.name').innerText = file.name
-    listItem.querySelector('.size').setAttribute('value', file.size)
-    listItem.querySelector('.delete-btn').addEventListener('click', () => {
+    listItem.querySelector('[data-file-name]').setAttribute('data-file-name', file.name)
+    listItem.querySelector('.name').innerText = name || file.name
+    listItem.querySelector('.size').setAttribute('value', size || file.size)
+    listItem.querySelector('.delete-btn').addEventListener('click', (e) => {
+      e.stopPropagation()
       this.stateService.send('REMOVE_FILE', { file })
     })
     this.appRoot.querySelector('.file-list').appendChild(listItem)
   }
 
+  renderFileDetail({ name, file }) {
+    const loadingIndicator = this.appRoot.querySelector('.file-details-loading')
+    if (loadingIndicator) {
+      loadingIndicator.parentNode.removeChild(loadingIndicator)
+    }
+
+    const template = document.querySelector('#fileDetailItem')
+    const detail = template.content.cloneNode(true)
+    detail.querySelector('[data-file-name]').setAttribute('data-file-name', file.name)
+    detail.querySelector('.name').innerText = name || file.name
+    detail.querySelector('.name-input').setAttribute('value', name || file.name)
+    detail.querySelector('.edit-btn').addEventListener('click', (e) => {
+      const parent = e.target.closest('[data-file-name]')
+      const header = parent.querySelector('.file-detail-header')
+      const form = parent.querySelector('.name-form')
+      header.classList.add('hidden')
+      form.classList.remove('hidden')
+      form.addEventListener('submit', (e) => {
+        e.preventDefault()
+        this.stateService.send('UPDATE_FILE_NAME', {
+          file, name: form.querySelector('input').value,
+        })
+        header.classList.remove('hidden')
+        form.classList.add('hidden')
+      })
+    })
+    detail.querySelector('textarea').addEventListener('change', (e) => {
+      this.stateService.send('UPDATE_FILE_DESCRIPTION', {
+        file, description: e.target.value,
+      })
+    })
+    this.appRoot.querySelector('.file-detail-list').appendChild(detail)
+  }
+
   renderFileStart({ file }) {
-    const listItem = this.appRoot.querySelector(`.file-list-item[data-name="${file.name}"]`)
+    const listItem = this.appRoot.querySelector(`.file-list [data-file-name="${file.name}"]`)
     listItem.querySelector('.status').innerHTML = '<sl-spinner class="icon"></sl-spinner>'    
   }
 
   renderFileError({ file }) {
-    const listItem = this.appRoot.querySelector(`.file-list-item[data-name="${file.name}"]`)
+    const listItem = this.appRoot.querySelector(`.file-list [data-file-name="${file.name}"]`)
+    listItem.querySelector('.file-info').setAttribute('aria-disabled', true)
     listItem.querySelector('.status').innerHTML = '<sl-icon class="icon danger" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/exclamation-circle-fill.svg"></sl-icon>'
   }
 
-  renderDeletedFile({ file }) {
-    const listItem = this.appRoot.querySelector(`.file-list-item[data-name="${file.name}"]`)
-    listItem.classList.add('hidden')
+  renderFileSuccess({ file }) {
+    const listItem = this.appRoot.querySelector(`.file-list [data-file-name="${file.name}"]`)
+    listItem.querySelector('.status').innerHTML = '<sl-icon class="icon success" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/check-circle-fill.svg"></sl-icon>'
+    listItem.querySelector('.file-info').addEventListener('click', (e) => {
+      const item = this.appRoot.querySelector(`.file-detail-list [data-file-name="${file.name}"]`)
+      item.scrollIntoView({ behavior: 'smooth' })
+      item.classList.add('selected')
+      window.setTimeout(() => {
+        item.classList.remove('selected')
+      }, 1000)
+    })
   }
 
-  renderFileSuccess({ file }) {
-    const listItem = this.appRoot.querySelector(`.file-list-item[data-name="${file.name}"]`)
-    listItem.querySelector('.status').innerHTML = '<sl-icon class="icon success" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/check-circle-fill.svg"></sl-icon>'
+  renderDeletedFile({ file }) {
+    const items = this.appRoot.querySelectorAll(`[data-file-name="${file.name}"]`)
+    Array.from(items).forEach(item => {
+      item.classList.add('hidden')
+    })
+  }
+
+  renderFileNames({ name, file }) {
+    const items = this.appRoot.querySelectorAll(`[data-file-name="${file.name}"] .name`)
+    Array.from(items).forEach(item => {
+      item.innerText = name
+    })
   }
 
   renderIncompleteWarning() {
+    this.appRoot.classList.remove('app-content-2-col')
     const template = document.querySelector('#incompleteWarningScreen')
     const section = template.content.cloneNode(true)
     section.querySelector('.back-btn').addEventListener('click', () => {
@@ -250,6 +346,7 @@ export class App {
   }
 
   renderCreatingSite() {
+    this.appRoot.classList.remove('app-content-2-col')
     const template = document.querySelector('#creatingSiteScreen')
     const section = template.content.cloneNode(true)
     this.appRoot.replaceChildren(section)
@@ -294,7 +391,7 @@ export class App {
     btn.removeAttribute('disabled')
   }
 
-  uploadSite({ filesToWrap }) {
-    this.wrapperService.uploadWrappedArchives(filesToWrap)
+  uploadSite({ fileMap }) {
+    this.wrapperService.uploadWrappedArchives(fileMap)
   }
 }
