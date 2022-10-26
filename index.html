@@ -71,7 +71,13 @@
           </svg>
           <sl-animation name="pulse" iterations="1" playback-rate="2">
             <div class="dropzone-content">
-              <div class="dropzone-label">Click here or drop some files.</div>
+              <div class="dropzone-label">
+                <p class="error-message hidden">
+                  No valid web archive files selected.
+                </p>
+
+                Click here or drop some files.
+              </div>
               <p class="help-text">
                 Multiple .wacz files will be combined into a single browsable site
               </p>
