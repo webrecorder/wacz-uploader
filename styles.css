@@ -388,8 +388,17 @@ a:active {
 .file-detail {
   border-radius: 0.25rem;
   padding: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   transition: background-color 0.5s;
+}
+
+.file-detail:before {
+  content: attr(data-file-name);
+  display: block;
+  color: var(--sl-color-gray-500);
+  font-size: var(--sl-font-size-x-small);
+  font-weight: normal;
+  margin-bottom: 0.25rem;
 }
 
 .file-detail.selected {

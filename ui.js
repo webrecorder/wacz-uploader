@@ -25,6 +25,10 @@ const initialContext = {
   fileMap: new Map(),
 }
 
+function formatFileName(fileName) {
+  return fileName.slice(0, fileName.lastIndexOf('.'))
+}
+
 export class App {
   appRoot = null
   wrapperService = null
@@ -48,7 +52,7 @@ export class App {
           actions: assign({
             fileMap: (ctx, { fileList }) =>
               new Map(
-                fileList.map((file) => [file.name, { name: file.name, file }])
+                fileList.map((file) => [file.name, { name: formatFileName(file.name), file }])
               ),
           }),
         },
@@ -311,12 +315,12 @@ export class App {
     fileMap.forEach((value) => {
       this.renderFile(value)
 
-      // if (value.rejected) {
-      //   this.renderFileError(value)
-      // } else {
-      //   this.renderFileSuccess(value)
-      //   this.renderFileDetail(value)
-      // }
+      if (value.rejected) {
+        this.renderFileError(value)
+      } else if (value.completed) {
+        this.renderFileSuccess(value)
+        this.renderFileDetail(value)
+      }
     })
   }
 
@@ -422,12 +426,10 @@ export class App {
   }
 
   renderFileNames({ name, file }) {
-    const items = this.appRoot.querySelectorAll(
-      `[data-file-name="${file.name}"] .name`
+    const item = this.appRoot.querySelector(
+      `.file-detail-list [data-file-name="${file.name}"] .name`
     )
-    Array.from(items).forEach((item) => {
-      item.innerText = name
-    })
+    item.innerText = name
   }
 
   renderIncompleteWarning() {
