@@ -18,25 +18,6 @@ const wrapper = new ArchiveWrapper({
 
 new App({ wrapper })
 
-window.dropzone.addEventListener('dragenter', (e) => {
-  if (!window.dropzone.contains(e.relatedTarget)) {
-    window.dropzone.querySelector('sl-animation').setAttribute('play', true)
-  }
-})
-
-window.dropzone.addEventListener('dragover', (e) => {
-  e.preventDefault()
-})
-
-window.dropzone.addEventListener('drop', (e) => {
-  wrapper.uploadFromDropEvent(e)
-  e.preventDefault()
-})
-
-window.fileInput.addEventListener('change', (e) => {
-  wrapper.uploadFromFileInputEvent(e)
-})
-
 wrapper.addEventListener('uploadsitestart', () => {
   log('Starting wrapper upload')
 })

@@ -10,6 +10,12 @@ import { sha256 } from 'multiformats/hashes/sha2'
 const DEFAULT_TEMPLATE = 'ipfs://bafybeihrupxyvw4tqdi4voy3olmhstmrosxjgfwyjtknaxzh27t5sa6zkm/'
 const ARCHIVES_INDEX_NAME = 'wrg-runtime-config.json'
 
+export class NoValidFilesEvent extends Event {
+  constructor () {
+    super('novalidfiles')
+  }
+}
+
 export class UploadFileStartEvent extends Event {
   constructor (file) {
     super('uploadfilestart')
@@ -91,14 +97,46 @@ export class ArchiveWrapper extends EventTarget {
     this.ipfs = ipfs
   }
 
-  async uploadFromFileInputEvent (e) {
-    const fileList = e.target.files
-    return this.uploadFiles(fileList)
+  /**
+   * @param {FileList} fileList
+   * @returns {{ accept: FileList; reject: FileList }}
+   */
+   static filesByAccept(fileList) {
+    const acceptList = new DataTransfer();
+    const rejectList = new DataTransfer();
+    Array.from(fileList).forEach((file) => {
+      const { name, type } = file;
+      if (/\.wa(cz|rc)$/.test(name) || /\/wa(cz|rc)$/.test(type)) {
+        acceptList.items.add(file);
+      } else {
+        rejectList.items.add(file);
+      }
+    });
+
+    return {
+      accept: acceptList.files,
+      reject: rejectList.files,
+    };
   }
 
-  async uploadFromDropEvent (e) {
+  async uploadFromFileInputEvent(e) {
+    const fileList = e.target.files
+    const { accept, reject } = ArchiveWrapper.filesByAccept(fileList)
+
+    if (accept.length) {
+      return this.uploadFiles(accept)
+    }
+    this.dispatchEvent(new NoValidFilesEvent(reject))
+  }
+
+  async uploadFromDropEvent(e) {
     const fileList = e.dataTransfer.files
-    return this.uploadFiles(fileList)
+    const { accept, reject } = ArchiveWrapper.filesByAccept(fileList)
+
+    if (accept.length) {
+      return this.uploadFiles(accept)
+    }
+    this.dispatchEvent(new NoValidFilesEvent(reject))
   }
 
   /**
@@ -116,16 +154,18 @@ export class ArchiveWrapper extends EventTarget {
       const archiveMap = new Map()
       let rejectedMap = null
 
-      for (const { status, value, reason } of results) {
-        const { url, name, size } = value
+      results.forEach(({ status, value, reason }, i) => {
+        const file = fileList[i]
+
         if (status === 'rejected') {
-          console.debug(`uploadFiles ${name} rejected reason: ${reason}`)
+          console.debug(`uploadFiles ${file.name} rejected reason: ${reason}`)
           rejectedMap = rejectedMap || new Map()
-          rejectedMap.set(name, { reason })
+          rejectedMap.set(file.name, { reason })
         } else {
-          archiveMap.set(name, { url, size, name })
+          const { url, name, size } = value
+          archiveMap.set(file.name, { url, size, name })
         }
-      }
+      })
 
       this.dispatchEvent(new UploadFileListFinishEvent({
         completed: archiveMap,

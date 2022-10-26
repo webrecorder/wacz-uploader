@@ -2,8 +2,8 @@
 
 :root {
   --title-font-size: 2rem;
-  --sl-color-blue-500: #0366D6;
-  --sl-shadow-small: 0 1px 2px rgba(0,0,0,.15);
+  --sl-color-blue-500: #0366d6;
+  --sl-shadow-small: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 * {
@@ -25,19 +25,19 @@ input,
 select,
 textarea {
   all: unset;
-  border-radius: .25rem;
+  border-radius: 0.25rem;
   box-sizing: border-box;
 }
 
 button {
-  border-radius: .25rem;
+  border-radius: 0.25rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity .15s, background-color .15s;
+  transition: opacity 0.15s, background-color 0.15s;
 }
 
 button:not(:disabled):hover {
-  opacity: .8;
+  opacity: 0.8;
 }
 
 button:disabled {
@@ -104,8 +104,8 @@ textarea {
   border: 1px solid var(--sl-input-border-color);
   color: var(--sl-color-gray-700);
   font-size: var(--sl-font-size-small);
-  padding-left: .5rem;
-  padding-right: .5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
   width: 100%;
 }
 
@@ -125,8 +125,8 @@ textarea {
 
 textarea {
   height: 5rem;
-  padding-top: .5rem;
-  padding-bottom: .5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 input::placeholder,
@@ -172,7 +172,7 @@ a:active {
 
 .panel {
   border: 1px solid var(--sl-panel-border-color);
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   width: 100%;
   background-color: var(--sl-panel-background-color);
 }
@@ -207,7 +207,7 @@ a:active {
 }
 
 .scrollable {
-  --scrollable-top-indicator-height: .5rem;
+  --scrollable-top-indicator-height: 0.5rem;
   --scrollable-bottom-indicator-height: 1rem;
   overflow: hidden;
   position: relative;
@@ -215,7 +215,7 @@ a:active {
 
 .scrollable:before,
 .scrollable:after {
-  content: "";
+  content: '';
   display: block;
   position: absolute;
   left: 0;
@@ -226,13 +226,19 @@ a:active {
 .scrollable:before {
   top: 0;
   height: var(--scrollable-top-indicator-height);
-  background-image: linear-gradient(var(--sl-panel-background-color), transparent);
+  background-image: linear-gradient(
+    var(--sl-panel-background-color),
+    transparent
+  );
 }
 
 .scrollable:after {
   bottom: 0;
   height: var(--scrollable-bottom-indicator-height);
-  background-image: linear-gradient(transparent, var(--sl-panel-background-color));
+  background-image: linear-gradient(
+    transparent,
+    var(--sl-panel-background-color)
+  );
 }
 
 .scroll-content {
@@ -263,7 +269,7 @@ a:active {
   font-weight: normal;
   line-height: 1.5rem;
   margin-top: 0;
-  margin-bottom: .375rem;
+  margin-bottom: 0.375rem;
 }
 
 .help-text {
@@ -291,8 +297,7 @@ a:active {
   display: grid;
   grid-gap: 1.5rem;
   grid-template-columns: repeat(var(--app-content-columns, 1), 1fr);
-  grid-template-rows: auto;
-  /* grid-template-rows: max-content; */
+  grid-template-rows: max-content;
   height: calc(100vh - var(--title-font-size) - var(--sl-spacing-small) * 3);
   max-height: 33rem;
 }
@@ -300,12 +305,13 @@ a:active {
 @media only screen and (min-width: 1000px) {
   .app-content {
     padding: 2rem;
+    grid-template-rows: auto;
   }
 
   .app-content-2-col {
     --app-content-columns: 2;
   }
-  
+
   .app-content-2-col .app-content-header {
     /* Reverse order of header and body */
     order: 1;
@@ -313,12 +319,12 @@ a:active {
 }
 
 .app-content-header {
-  padding:  1.5rem;
+  padding: 1.5rem;
 }
 
 .file-list-heading {
   margin: 0;
-  padding-bottom: .125rem;
+  padding-bottom: 0.125rem;
   border-bottom: 1px solid var(--sl-panel-border-color);
 }
 
@@ -329,18 +335,18 @@ a:active {
 }
 
 .file-list li:not(:last-child) {
-  margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
 }
 
 .file-info {
   display: grid;
   grid-template-columns: min-content 1fr max-content max-content;
-  grid-gap: .5rem;
+  grid-gap: 0.5rem;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--sl-panel-border-color);
-  border-radius: .25rem;
-  padding: .5rem;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
   line-height: 1;
 }
 
@@ -349,7 +355,7 @@ a:active {
 }
 
 .file-info:not([aria-disabled]) {
-  transition: box-shadow .15s, transform .15s;
+  transition: box-shadow 0.15s, transform 0.15s;
   cursor: pointer;
 }
 
@@ -372,7 +378,7 @@ a:active {
 
 .file-details-loading sl-spinner {
   font-size: 2rem;
-  margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
 }
 
 .file-detail-list {
@@ -380,10 +386,10 @@ a:active {
 }
 
 .file-detail {
-  border-radius: .25rem;
-  padding: .5rem;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
   margin-bottom: 1rem;
-  transition: background-color .5s
+  transition: background-color 0.5s;
 }
 
 .file-detail.selected {
@@ -409,7 +415,7 @@ a:active {
 
 .name-input {
   flex: 1;
-  margin-right: .5rem;
+  margin-right: 0.5rem;
 }
 
 .error-message {
@@ -439,7 +445,7 @@ a:active {
   display: block;
   width: 100%;
   height: 100%;
-  padding: 1.5rem;
+  min-height: 26rem;
   cursor: pointer;
 }
 
@@ -454,11 +460,11 @@ a:active {
 
 @keyframes animated-border {
   0% {
-    stroke-dashoffset: 0px;
+    stroke-dashoffset: 8px;
     animation-timing-function: cubic-bezier(0, 0, 1, 1);
   }
   100% {
-    stroke-dashoffset: 48px;
+    stroke-dashoffset: 56px;
   }
 }
 
@@ -468,7 +474,7 @@ a:active {
   justify-content: center;
   flex-direction: column;
   width: 100%;
-  height: 100%
+  height: 100%;
 }
 
 .dropzone-label {
@@ -478,7 +484,7 @@ a:active {
 
 .file-upload-container {
   position: relative;
-  aspect-ratio: 460 / 468;
+  /* aspect-ratio: 460 / 468; */
 }
 
 .file-upload-border {
@@ -522,7 +528,7 @@ a:active {
 
 #debug {
   position: fixed;
-  background-color: rgba(255,255,0,.5);
+  background-color: rgba(255, 255, 0, 0.5);
   top: 0;
   right: 0;
   font-size: 11px;
