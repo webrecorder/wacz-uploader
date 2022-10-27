@@ -134,33 +134,33 @@ textarea::placeholder {
   color: var(--sl-color-gray-400);
 }
 
-a.site-url {
+a.primary {
   color: var(--sl-color-blue-500);
   text-decoration: none;
 }
 
-a.site-url:hover,
-a.site-url:active {
+a.primary:hover,
+a.primary:active {
   text-decoration: underline;
 }
 
-a.footer-link {
+a.secondary {
   color: var(--sl-color-gray-500);
   text-decoration: none;
 }
 
-a.footer-link .label {
+a.secondary .label {
   margin: 0 0.25rem;
 }
 
-a.footer-link .label,
-a.footer-link .icon {
+a.secondary .label,
+a.secondary .icon {
   display: inline-block;
   vertical-align: middle;
 }
 
-a.footer-link:hover,
-a.footer-link:active {
+a.secondary:hover,
+a.secondary:active {
   color: var(--sl-color-gray-800);
 }
 
