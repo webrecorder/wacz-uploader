@@ -480,11 +480,11 @@ export class App {
     this.appRoot.replaceChildren(section)
   }
 
-  renderDone({ url }) {
+  renderDone({ url, gatewayUrl }) {
     const template = document.querySelector('#createSiteDoneScreen')
     const section = template.content.cloneNode(true)
     const link = section.querySelector('.site-url')
-    link.href = url
+    link.href = gatewayUrl || url
     link.innerText = url
     section.querySelector('.restart-btn').addEventListener('click', () => {
       // TODO reset state instead of refreshing page

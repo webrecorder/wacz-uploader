@@ -7,8 +7,11 @@ import * as Block from 'multiformats/block'
 import * as DagPB from '@ipld/dag-pb'
 import { sha256 } from 'multiformats/hashes/sha2'
 
-const DEFAULT_TEMPLATE = 'ipfs://bafybeihrupxyvw4tqdi4voy3olmhstmrosxjgfwyjtknaxzh27t5sa6zkm/'
-const ARCHIVES_INDEX_NAME = 'wrg-runtime-config.json'
+import { toGatewayURL } from 'auto-js-ipfs'
+
+// const DEFAULT_TEMPLATE = 'ipfs://bafybeihrupxyvw4tqdi4voy3olmhstmrosxjgfwyjtknaxzh27t5sa6zkm/'
+const DEFAULT_TEMPLATE = 'ipfs://bafybeic3zi46caikdvukly7xwnjrecbvmllafvopvlyw6ylt3oeht7h5om/'
+const ARCHIVES_INDEX_NAME = 'wrg-config.json'
 
 export class NoValidFilesEvent extends Event {
   constructor () {
@@ -81,9 +84,10 @@ export class UploadSiteStartEvent extends Event {
 }
 
 export class UploadSiteFinishEvent extends Event {
-  constructor (url) {
+  constructor (url, gatewayUrl) {
     super('uploadsitefinish')
     this.url = url
+    this.gatewayUrl = gatewayUrl
   }
 }
 
@@ -193,12 +197,13 @@ export class ArchiveWrapper extends EventTarget {
       console.log('Uploading', file, this.ipfs, name)
 
       // TODO: Chunking here!
-      const url = await this.ipfs.uploadFile(file)
+      const url = (await this.ipfs.uploadFile(file)) + '#' + name
 
       this.dispatchEvent(new UploadFileMetadataStartEvent(file))
       console.log('Uploaded, getting metadata')
       // Also ends up preloading the file into IPFS gateways for us
-      const size = await this.ipfs.getSize(url)
+      // const size = await this.ipfs.getSize(url)
+      const size = file.size
 
       console.log('Got size and metadata', size, url)
 
@@ -210,16 +215,18 @@ export class ArchiveWrapper extends EventTarget {
       throw e
     }
   }
+
   /**
    * @param {Map} archiveMap - Map of successfully uploaded files
    * @returns {string} URL to archives website
    */
-  async uploadWrappedArchives(archiveMap) {
+  async uploadWrappedArchives (archiveMap) {
     console.debug('Uploading archiveMap:', archiveMap)
     try {
       this.dispatchEvent(new UploadSiteStartEvent())
       const url = await this.wrapArchives(archiveMap)
-      this.dispatchEvent(new UploadSiteFinishEvent(url))
+      const gatewayUrl = toGatewayURL(url)
+      this.dispatchEvent(new UploadSiteFinishEvent(url, gatewayUrl))
 
       return url
     } catch (e) {
@@ -242,7 +249,7 @@ export class ArchiveWrapper extends EventTarget {
 
     console.debug({ archivesJSON })
 
-    const { url } = await this.uploadFile(archivesJSON)
+    const url = await this.ipfs.uploadFile(archivesJSON)
 
     const size = new TextEncoder().encode(archivesJSON).length
 
