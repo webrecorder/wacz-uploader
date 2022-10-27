@@ -244,8 +244,6 @@ export class App {
     this.wrapperService = {
       uploadFiles: (...args) => wrapper.uploadFiles(...args),
       uploadWrappedArchives: (...args) => wrapper.uploadWrappedArchives(...args),
-      uploadFromDropEvent: (...args) => wrapper.uploadFromDropEvent(...args),
-      uploadFromFileInputEvent: (...args) => wrapper.uploadFromFileInputEvent(...args),
     }
     
     wrapper.addEventListener('uploadfilestart', (evt) =>
@@ -313,11 +311,9 @@ export class App {
       e.preventDefault()
       e.stopPropagation()
       this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.dataTransfer.files })
-      // this.wrapperService.uploadFromDropEvent(e)
     })
     window.fileInput.addEventListener('change', (e) => {
       this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.target.files })
-      // this.wrapperService.uploadFromFileInputEvent(e)
     })
   }
 
