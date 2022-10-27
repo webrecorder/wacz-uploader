@@ -4,25 +4,18 @@ A straightforward single page application for uploading your WACZ archives to IP
 
 ## Development
 
+Copy config file and replace `your_web3_storage_token` with your token:
+```
+cp config.js.sample config.js
+```
+
 Install dependencies:
 
 ```
 npm i
 ```
 
-Build the JS bundle:
-
-```
-npm run build
-```
-
-Start the dev server:
-
-```
-npm run serve
-```
-
-Start dev server and watch changes in bundled JS:
+Start dev server and reload on changes:
 
 ```
 npm run dev
