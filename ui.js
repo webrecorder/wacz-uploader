@@ -10,12 +10,7 @@ import {
 // Context stored in app state
 const initialContext = {
   /**
-   * File list staged for upload
-   * @type {FileList | null}
-   */
-  fileList: null,
-  /**
-   * File response from server
+   * Web archive files to upload
    * Mapped by original file name (ID)
    * @type {Map<string,{
    *   name: string;
@@ -32,6 +27,28 @@ const initialContext = {
 
 function formatFileName(fileName) {
   return fileName.slice(0, fileName.lastIndexOf('.'))
+}
+
+/**
+ * @param {FileList} fileList
+ * @returns {{ accept: FileList; reject: FileList }}
+ */
+function filesByAccept(fileList) {
+  const acceptList = new DataTransfer();
+  const rejectList = new DataTransfer();
+  Array.from(fileList).forEach((file) => {
+    const { name, type } = file;
+    if (/\.wa(cz|rc)$/.test(name) || /\/wa(cz|rc)$/.test(type)) {
+      acceptList.items.add(file);
+    } else {
+      rejectList.items.add(file);
+    }
+  });
+
+  return {
+    accept: acceptList.files,
+    reject: rejectList.files,
+  };
 }
 
 export class App {
@@ -51,25 +68,24 @@ export class App {
         },
       },
       on: {
-        FILE_INPUT_CHANGE: {
+        FILE_INPUT_CHANGE: [{
+          target: 'selectedFiles',
           actions: assign({
-            fileList: (ctx, { fileList }) => fileList,
-          })
-        },
-        NO_VALID_FILES_SELECTED: '.noValidFiles',
-        UPLOAD_FILE_LIST_START: {
-          target: 'uploadingFileList',
-          actions: assign({
-            fileMap: (ctx, { files }) =>
+            fileMap: (ctx, { fileList }) =>
               new Map(
-                files.map((file) => [file.name, { name: formatFileName(file.name), file }])
+                Array.from(fileList).map((file) => 
+                  [file.name, { name: formatFileName(file.name), file }])
               ),
           }),
-        },
+          cond: (ctx, evt) => filesByAccept(evt.fileList).accept.length > 0,
+        }, {
+          target: '.noValidFiles',
+          cond: (ctx, evt) => !filesByAccept(evt.fileList).accept.length,
+        }],
       },
     },
-    uploadingFileList: {
-      id: 'uploadingFileList',
+    selectedFiles: {
+      id: 'selectedFiles',
       entry: (ctx) => this.renderUploading(ctx),
       states: {
         finished: {
@@ -86,6 +102,14 @@ export class App {
         },
       },
       on: {
+        UPLOAD_FILE_LIST_START: {
+          // actions: assign({
+          //   fileMap: (ctx, { files }) =>
+          //     new Map(
+          //       files.map((file) => [file.name, { name: formatFileName(file.name), file }])
+          //     ),
+          // }),
+        },
         REMOVE_FILE: {
           actions: [
             assign({
@@ -178,7 +202,7 @@ export class App {
       entry: () => this.renderIncompleteWarning(),
       on: {
         BACK: {
-          target: 'uploadingFileList.finished',
+          target: 'selectedFiles.finished',
         },
         CONTINUE: {
           target: 'creatingSite.uploading',
@@ -198,7 +222,7 @@ export class App {
         error: {
           entry: (ctx, evt) => this.renderCreatingSiteError(evt),
           on: {
-            BACK: '#uploadingFileList.finished',
+            BACK: '#selectedFiles.finished',
             RETRY: 'uploading',
           },
         },
@@ -253,9 +277,6 @@ export class App {
       uploadFromFileInputEvent: (...args) => wrapper.uploadFromFileInputEvent(...args),
     }
     
-    wrapper.addEventListener('novalidfiles', (evt) =>
-      this.stateService.send('NO_VALID_FILES_SELECTED', evt)
-    )
     wrapper.addEventListener('uploadfilestart', (evt) =>
       this.stateService.send('FILE_UPLOAD_START', evt)
     )
@@ -317,11 +338,11 @@ export class App {
     window.dropzone.addEventListener('drop', (e) => {
       e.preventDefault()
       e.stopPropagation()
-      this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.target.files })
+      this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.dataTransfer.files })
       // this.wrapperService.uploadFromDropEvent(e)
     })
     window.fileInput.addEventListener('change', (e) => {
-      this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.dataTransfer.files })
+      this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.target.files })
       // this.wrapperService.uploadFromFileInputEvent(e)
     })
   }

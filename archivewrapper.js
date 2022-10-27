@@ -13,12 +13,6 @@ import { toGatewayURL } from 'auto-js-ipfs'
 const DEFAULT_TEMPLATE = 'ipfs://bafybeic3zi46caikdvukly7xwnjrecbvmllafvopvlyw6ylt3oeht7h5om/'
 const ARCHIVES_INDEX_NAME = 'wrg-config.json'
 
-export class NoValidFilesEvent extends Event {
-  constructor () {
-    super('novalidfiles')
-  }
-}
-
 export class UploadFileStartEvent extends Event {
   constructor (file) {
     super('uploadfilestart')
@@ -111,46 +105,12 @@ export class ArchiveWrapper extends EventTarget {
     this.ipfs = ipfs
   }
 
-  /**
-   * @param {FileList} fileList
-   * @returns {{ accept: FileList; reject: FileList }}
-   */
-   static filesByAccept(fileList) {
-    const acceptList = new DataTransfer();
-    const rejectList = new DataTransfer();
-    Array.from(fileList).forEach((file) => {
-      const { name, type } = file;
-      if (/\.wa(cz|rc)$/.test(name) || /\/wa(cz|rc)$/.test(type)) {
-        acceptList.items.add(file);
-      } else {
-        rejectList.items.add(file);
-      }
-    });
-
-    return {
-      accept: acceptList.files,
-      reject: rejectList.files,
-    };
-  }
-
   async uploadFromFileInputEvent(e) {
-    return this.handleFileInput(e.target.files)
+    return this.uploadFiles(e.target.files)
   }
 
   async uploadFromDropEvent(e) {
-    return this.handleFileInput(e.dataTransfer.files)
-  }
-
-  /**
-   * @param {FileList} fileList 
-   */
-  async handleFileInput(fileList) {
-    const { accept, reject } = ArchiveWrapper.filesByAccept(fileList)
-
-    if (accept.length) {
-      return this.uploadFiles(accept)
-    }
-    this.dispatchEvent(new NoValidFilesEvent(reject))
+    return this.uploadFiles(e.dataTransfer.files)
   }
 
   /**
