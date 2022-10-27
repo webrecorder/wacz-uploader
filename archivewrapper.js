@@ -72,11 +72,14 @@ export class UploadFileListErrorEvent extends Event {
 }
 
 export class UploadSiteStartEvent extends Event {
-  /**
-   * @param {Map}
-   */
   constructor () {
     super('uploadsitestart')
+  }
+}
+
+export class UploadSiteMetadataEvent extends Event {
+  constructor () {
+    super('uploadsitemetadatastart')
   }
 }
 
@@ -210,6 +213,7 @@ export class ArchiveWrapper extends EventTarget {
 
     const archivesJSON = JSON.stringify({ archives }, null, '\t')
 
+    this.dispatchEvent(new UploadSiteMetadataEvent())
     console.debug({ archivesJSON })
 
     const url = await this.ipfs.uploadFile(archivesJSON)

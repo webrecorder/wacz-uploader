@@ -15,12 +15,11 @@ const initialContext = {
    * @type {Map<string,{
    *   name: string;
    *   description: string;
-   *   url: string;
    *   size: number;
    *   file: File;
    *   isUploading: boolean;
-   *   rejected: boolean;
-   *   completed: boolean;
+   *   error: Error;
+   *   url: string;
    * }>}
    */
   fileMap: new Map(),
@@ -152,7 +151,7 @@ export class App {
           on: {
             UPLOAD_FILE_LIST_START: {
               actions: () => this.renderCreatingSiteStatusMessage({
-                message: 'Starting file upload...'
+                message: 'Starting upload...'
               }),
             },
             UPLOAD_FILE_LIST_FINISH: [{
@@ -162,22 +161,44 @@ export class App {
               target: 'uploadingSite',
               cond: (ctx, evt) => !evt.rejected || !evt.rejected.size,
             }],
+            FILE_UPLOAD_START: {
+              actions: assign({
+                fileMap: (ctx, { file }) => {
+                  const data = ctx.fileMap.get(file.name)
+                  ctx.fileMap.set(file.name, { ...data, isUploading: true })
+                  return ctx.fileMap
+                },
+              }),
+            },
+            FILE_UPLOAD_ERROR: {
+              actions: assign({
+                fileMap: (ctx, { file, error }) => {
+                  const data = ctx.fileMap.get(file.name)
+                  ctx.fileMap.set(file.name, { ...data, error })
+                  return ctx.fileMap
+                },
+              }),
+            },
+            FILE_UPLOAD_SUCCESS: {
+              actions: assign({
+                fileMap: (ctx, { file, url }) => {
+                  const data = ctx.fileMap.get(file.name)
+                  ctx.fileMap.set(file.name, { ...data, url })
+                  return ctx.fileMap
+                },
+              }),
+            },
           },
         },
         uploadingSite: {
           entry: (ctx) => this.uploadSite(ctx),
           on: {
-            FILE_UPLOAD_START: {
+            UPLOAD_SITE_START: {
               actions: () => this.renderCreatingSiteStatusMessage({
                 message: 'Uploading site to IPFS...'
               }),
             },
-            FILE_UPLOAD_METADATA_START: {
-              actions: () => this.renderCreatingSiteStatusMessage({
-                message: 'Getting website metadata...'
-              }),
-            },
-            FILE_UPLOAD_SUCCESS: {
+            UPLOAD_SITE_METADATA_START: {
               actions: () => this.renderCreatingSiteStatusMessage({
                 message: 'Almost done...'
               }),
@@ -251,6 +272,9 @@ export class App {
     wrapper.addEventListener('uploadsitestart', (evt) =>
       this.stateService.send('UPLOAD_SITE_START', evt)
     )
+    wrapper.addEventListener('uploadsitemetadatastart', (evt) =>
+      this.stateService.send('UPLOAD_SITE_METADATA_START', evt)
+    )
     wrapper.addEventListener('uploadsitefinish', (evt) =>
       this.stateService.send('UPLOAD_SITE_FINISH', evt)
     )
@@ -310,9 +334,9 @@ export class App {
       this.renderFile(value)
       this.renderFileDetail(value)
 
-      if (value.rejected) {
+      if (value.error) {
         this.renderFileError(value)
-      } else if (value.completed) {
+      } else if (value.url) {
         this.renderFileSuccess(value)
       } else if (value.isUploading) {
         this.renderFileStart(value)
