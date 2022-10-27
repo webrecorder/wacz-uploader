@@ -242,7 +242,9 @@ export class ArchiveWrapper extends EventTarget {
 
     console.debug({ archivesJSON })
 
-    const { url, size } = await this.uploadFile(archivesJSON)
+    const { url } = await this.uploadFile(archivesJSON)
+
+    const size = new TextEncoder().encode(archivesJSON).length
 
     this.addLink(root, ARCHIVES_INDEX_NAME, url, size)
 
