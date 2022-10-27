@@ -10,7 +10,12 @@ import {
 // Context stored in app state
 const initialContext = {
   /**
-   * Files metadata
+   * File list staged for upload
+   * @type {FileList | null}
+   */
+  fileList: null,
+  /**
+   * File response from server
    * Mapped by original file name (ID)
    * @type {Map<string,{
    *   name: string;
@@ -46,13 +51,18 @@ export class App {
         },
       },
       on: {
+        FILE_INPUT_CHANGE: {
+          actions: assign({
+            fileList: (ctx, { fileList }) => fileList,
+          })
+        },
         NO_VALID_FILES_SELECTED: '.noValidFiles',
         UPLOAD_FILE_LIST_START: {
           target: 'uploadingFileList',
           actions: assign({
-            fileMap: (ctx, { fileList }) =>
+            fileMap: (ctx, { files }) =>
               new Map(
-                fileList.map((file) => [file.name, { name: formatFileName(file.name), file }])
+                files.map((file) => [file.name, { name: formatFileName(file.name), file }])
               ),
           }),
         },
@@ -307,10 +317,12 @@ export class App {
     window.dropzone.addEventListener('drop', (e) => {
       e.preventDefault()
       e.stopPropagation()
-      this.wrapperService.uploadFromDropEvent(e)
+      this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.target.files })
+      // this.wrapperService.uploadFromDropEvent(e)
     })
     window.fileInput.addEventListener('change', (e) => {
-      this.wrapperService.uploadFromFileInputEvent(e)
+      this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.dataTransfer.files })
+      // this.wrapperService.uploadFromFileInputEvent(e)
     })
   }
 

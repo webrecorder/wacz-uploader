@@ -50,9 +50,12 @@ export class UploadFileErrorEvent extends Event {
 }
 
 export class UploadFileListStartEvent extends Event {
-  constructor (fileList) {
+  /**
+   * @param {File[]} files 
+   */
+  constructor (files) {
     super('uploadfileliststart')
-    this.fileList = fileList
+    this.files = files
   }
 }
 
@@ -131,17 +134,17 @@ export class ArchiveWrapper extends EventTarget {
   }
 
   async uploadFromFileInputEvent(e) {
-    const fileList = e.target.files
-    const { accept, reject } = ArchiveWrapper.filesByAccept(fileList)
-
-    if (accept.length) {
-      return this.uploadFiles(accept)
-    }
-    this.dispatchEvent(new NoValidFilesEvent(reject))
+    return this.handleFileInput(e.target.files)
   }
 
   async uploadFromDropEvent(e) {
-    const fileList = e.dataTransfer.files
+    return this.handleFileInput(e.dataTransfer.files)
+  }
+
+  /**
+   * @param {FileList} fileList 
+   */
+  async handleFileInput(fileList) {
     const { accept, reject } = ArchiveWrapper.filesByAccept(fileList)
 
     if (accept.length) {
@@ -151,7 +154,7 @@ export class ArchiveWrapper extends EventTarget {
   }
 
   /**
-   * @param {File[]} fileList
+   * @param {FileList} fileList
    * @returns {Map} Map of successfully uploaded files
    */
   async uploadFiles (fileList) {
