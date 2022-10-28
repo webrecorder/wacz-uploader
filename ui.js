@@ -5,7 +5,7 @@ import {
   createMachine,
   interpret,
   assign,
-} from 'https://unpkg.com/xstate@4.33.6/dist/xstate.web.js'
+} from 'https://cdn.jsdelivr.net/npm/xstate@4.33.6/dist/xstate.web.js'
 
 // Context stored in app state
 const initialContext = {
