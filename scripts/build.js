@@ -1,5 +1,6 @@
 import { build } from 'esbuild'
-import { WEB3_STORAGE_TOKEN } from '../config.js'
+import dotenv from 'dotenv'
+dotenv.config()
 
 const isProd = process.env.NODE_ENV === 'production'
 const minify = process.argv.includes('--minify')
@@ -14,6 +15,6 @@ build({
   minify: minify || isProd,
   watch: watch,
   define: {
-    '__define__.WEB3_STORAGE_TOKEN': JSON.stringify(WEB3_STORAGE_TOKEN || ''),
+    '__define__.WEB3_STORAGE_TOKEN': JSON.stringify(process.env.WEB3_STORAGE_TOKEN || ''),
   },
 }).catch(() => process.exit(1))

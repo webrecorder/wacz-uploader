@@ -6,7 +6,7 @@ A straightforward single page application for uploading your WACZ archives to IP
 
 Copy config file and replace `your_web3_storage_token` with your token:
 ```
-cp config.js.sample config.js
+cp .env.sample .env
 ```
 
 Install dependencies:

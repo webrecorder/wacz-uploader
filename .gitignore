@@ -2,7 +2,6 @@ bundle.js*
 config.js
 .vscode
 .DS_Store
-.env
 
 # Logs
 logs
