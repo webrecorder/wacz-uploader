@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - gh-pages
-      - setup-prod-build
 
   workflow_dispatch:
 
