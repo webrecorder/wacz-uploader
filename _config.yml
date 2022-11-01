@@ -1,2 +1,5 @@
 exclude:
   - scripts
+include:
+  - bundle.js
+  - bundle.js.map
