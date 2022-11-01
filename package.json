@@ -4,6 +4,7 @@
   "description": "A straightforward single page application for uploading your WACZ archives to IPFS",
   "main": "index.js",
   "type": "module",
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "standard --fix",
