@@ -7,10 +7,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "standard --fix",
-    "bundle": "esbuild index.js --bundle --sourcemap --outfile=bundle.js --format=esm",
-    "build": "npm run bundle -- --minify",
+    "build": "NODE_ENV=production node scripts/build.js",
     "serve": "wds --node-resolve --open --watch",
-    "dev": "npm run build && concurrently \"npm run serve\" \"npm run bundle -- --watch\""
+    "dev": "concurrently \"npm run build -- --watch\" \"wait-on bundle.js && npm run serve\""
   },
   "repository": {
     "type": "git",
@@ -25,9 +24,9 @@
   "devDependencies": {
     "@web/dev-server": "^0.1.34",
     "concurrently": "^7.4.0",
-    "dotenv": "^16.0.3",
     "esbuild": "^0.15.10",
-    "standard": "^17.0.0"
+    "standard": "^17.0.0",
+    "wait-on": "^6.0.1"
   },
   "dependencies": {
     "@ipld/car": "^4.1.6",
