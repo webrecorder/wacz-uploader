@@ -7,9 +7,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "standard --fix",
-    "build": "esbuild index.js --bundle --sourcemap --outfile=bundle.js --format=esm",
+    "bundle": "esbuild index.js --bundle --sourcemap --outfile=bundle.js --format=esm",
+    "build": "npm run bundle -- --minify",
     "serve": "wds --node-resolve --open --watch",
-    "dev": "npm run build && concurrently \"npm run serve\" \"npm run build -- --watch\""
+    "dev": "npm run build && concurrently \"npm run serve\" \"npm run bundle -- --watch\""
   },
   "repository": {
     "type": "git",
