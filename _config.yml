@@ -1,0 +1,4 @@
+exclude:
+  - scripts
+  - config.js
+  - config.js.sample
