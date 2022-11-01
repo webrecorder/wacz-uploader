@@ -8,7 +8,7 @@ const PERSIST_KEY = 'wacz-archives'
 log('Initializing IPFS')
 
 const { api: ipfs } = await create({
-  web3StorageToken: __define__.WEB3_STORAGE_TOKEN
+  web3StorageToken: __define__.PUBLIC_WEB3_STORAGE_TOKEN
 })
 
 const wrapper = new ArchiveWrapper({

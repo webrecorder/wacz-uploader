@@ -4,7 +4,7 @@ A straightforward single page application for uploading your WACZ archives to IP
 
 ## Development
 
-Copy config file and replace `your_web3_storage_token` with your token:
+Copy config file and replace `your_public_web3_storage_token` with your token:
 ```
 cp .env.sample .env
 ```

@@ -15,6 +15,6 @@ build({
   minify: minify || isProd,
   watch: watch,
   define: {
-    '__define__.WEB3_STORAGE_TOKEN': JSON.stringify(process.env.WEB3_STORAGE_TOKEN || ''),
+    '__define__.PUBLIC_WEB3_STORAGE_TOKEN': JSON.stringify(process.env.PUBLIC_WEB3_STORAGE_TOKEN || ''),
   },
 }).catch(() => process.exit(1))
