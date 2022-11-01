@@ -26,4 +26,5 @@ Build JS files:
 npm run build
 ```
 
-> NOTE: This app should NOT be deployed to a production environment as it currently hardcodes your Web3 Storage auth token thereby exposing it in the browser.
+**Warning:**
+This app should NOT be deployed to a production environment if you do not want to publicly share your Web3 Storage auth token, as it currently hardcodes your token thereby exposing it in the browser.
