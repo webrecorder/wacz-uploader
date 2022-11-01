@@ -20,3 +20,5 @@ Start dev server and reload on changes:
 ```
 npm run dev
 ```
+
+> NOTE: This app should NOT be deployed to a production environment as it currently hardcodes your Web3 Storage auth token thereby exposing it in the browser.
