@@ -279,6 +279,26 @@ export class App {
     wrapper.addEventListener('uploadsiteerror', (evt) =>
       this.stateService.send('UPLOAD_SITE_ERROR', evt)
     )
+
+    window.setTimeout(() => {
+      this.stateService.send('FILE_INPUT_CHANGE', { fileList: [
+        new File([], 'fake', { type: 'application/wacz' }),
+        new File([], 'fake1', { type: 'application/wacz' }),
+        new File([], 'fake2', { type: 'application/wacz' }),
+        new File([], 'fake3', { type: 'application/wacz' }),
+        new File([], 'fake4', { type: 'application/wacz' }),
+        new File([], 'fake5', { type: 'application/wacz' }),
+        new File([], 'fake6', { type: 'application/wacz' }),
+        new File([], 'fake7', { type: 'application/wacz' }),
+        new File([], 'fake8', { type: 'application/wacz' }),
+        new File([], 'fake9', { type: 'application/wacz' }),
+        new File([], 'fake10', { type: 'application/wacz' }),
+        new File([], 'fake11', { type: 'application/wacz' }),
+        new File([], 'fake12', { type: 'application/wacz' }),
+        new File([], 'fake13', { type: 'application/wacz' }),
+        new File([], 'fake14', { type: 'application/wacz' }),
+      ] })
+    }, 500)
   }
 
   renderInitial() {

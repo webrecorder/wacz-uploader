@@ -344,6 +344,20 @@ a.secondary:active {
   padding: 1.5rem;
 }
 
+.file-input-label {
+  display: inline-block;
+  color: var(--sl-color-blue-500);
+  font-size: var(--sl-font-size-small);
+  font-weight: 600;
+  cursor: pointer;
+  padding: .5rem;
+  transition: color .15s;
+}
+
+.file-input-label:hover {
+  color: var(--sl-color-blue-400);
+}
+
 .file-list-heading {
   margin: 0;
   padding-bottom: 0.125rem;
@@ -468,7 +482,7 @@ a.secondary:active {
   color: var(--sl-color-success-600);
 }
 
-#fileInput {
+.file-input {
   display: none;
 }
 
