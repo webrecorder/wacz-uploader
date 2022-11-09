@@ -10,7 +10,7 @@
     "lint": "standard --fix",
     "build": "NODE_ENV=production node scripts/build.js",
     "serve": "wds --node-resolve --open --watch",
-    "dev": "concurrently \"npm run build -- --watch\" \"wait-on bundle.js && npm run serve\""
+    "dev": "concurrently \"node scripts/build.js --watch\" \"wait-on bundle.js && npm run serve\""
   },
   "repository": {
     "type": "git",

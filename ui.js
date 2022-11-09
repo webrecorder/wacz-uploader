@@ -26,7 +26,18 @@ const initialContext = {
 }
 
 function formatFileName(fileName) {
-  return fileName.slice(0, fileName.lastIndexOf('.'))
+  const idx = fileName.lastIndexOf('.')
+  if (idx > -1) {
+    return fileName.slice(0, fileName.lastIndexOf('.'))
+  }
+  return fileName
+}
+
+function mapFromFileList(fileList) {
+  return new Map(
+    Array.from(fileList).map((file) => 
+      [file.name, { name: formatFileName(file.name), file }])
+  )
 }
 
 /**
@@ -71,11 +82,7 @@ export class App {
         FILE_INPUT_CHANGE: [{
           target: 'editFileInformation',
           actions: assign({
-            fileMap: (ctx, { fileList }) =>
-              new Map(
-                Array.from(fileList).map((file) => 
-                  [file.name, { name: formatFileName(file.name), file }])
-              ),
+            fileMap: (ctx, { fileList }) => mapFromFileList(fileList),
           }),
           cond: (ctx, evt) => filesByAccept(evt.fileList).accept.length > 0,
         }, {
@@ -88,6 +95,21 @@ export class App {
       id: 'editFileInformation',
       entry: (ctx) => this.renderFileInformation(ctx),
       on: {
+        ADD_FILES: {
+          actions: [
+            assign({
+              fileMap: (ctx, { fileList }) => {
+                return new Map([
+                  ...ctx.fileMap,
+                  ...mapFromFileList(fileList)
+                ])
+              },
+            }),
+            (ctx, evt) => this.renderFiles({
+              fileMap: mapFromFileList(evt.fileList),
+            }),
+          ],
+        },
         REMOVE_FILE: [{
           // target: 'initial',
           actions: () => {
@@ -279,66 +301,44 @@ export class App {
     wrapper.addEventListener('uploadsiteerror', (evt) =>
       this.stateService.send('UPLOAD_SITE_ERROR', evt)
     )
-
-    window.setTimeout(() => {
-      this.stateService.send('FILE_INPUT_CHANGE', { fileList: [
-        new File([], 'fake', { type: 'application/wacz' }),
-        new File([], 'fake1', { type: 'application/wacz' }),
-        new File([], 'fake2', { type: 'application/wacz' }),
-        new File([], 'fake3', { type: 'application/wacz' }),
-        new File([], 'fake4', { type: 'application/wacz' }),
-        new File([], 'fake5', { type: 'application/wacz' }),
-        new File([], 'fake6', { type: 'application/wacz' }),
-        new File([], 'fake7', { type: 'application/wacz' }),
-        new File([], 'fake8', { type: 'application/wacz' }),
-        new File([], 'fake9', { type: 'application/wacz' }),
-        new File([], 'fake10', { type: 'application/wacz' }),
-        new File([], 'fake11', { type: 'application/wacz' }),
-        new File([], 'fake12', { type: 'application/wacz' }),
-        new File([], 'fake13', { type: 'application/wacz' }),
-        new File([], 'fake14', { type: 'application/wacz' }),
-      ] })
-    }, 500)
   }
 
   renderInitial() {
-    Array.from(document.querySelectorAll('.file-drag-drop')).forEach(elem => {
-      elem.addEventListener('drag', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-      })
-      elem.addEventListener('dragstart', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-      })
-      elem.addEventListener('dragend', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-      })
-      elem.addEventListener('dragleave', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-      })
-      elem.addEventListener('dragover', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-      })
-      elem.addEventListener('dragenter', (e) => {
-        if (!elem.contains(e.relatedTarget)) {
-          elem.querySelector('sl-animation').setAttribute('play', true)
-        }
-      })
-      elem.addEventListener('drop', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.dataTransfer.files })
-      })
-    })
+    const dragDropElem = this.appRoot.querySelector('.file-drag-drop')
 
-    Array.from(document.querySelectorAll('.file-input')).forEach(elem => {
-      elem.addEventListener('change', (e) => {
-        this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.target.files })
-      })
+    dragDropElem.addEventListener('drag', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+    })
+    dragDropElem.addEventListener('dragstart', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+    })
+    dragDropElem.addEventListener('dragend', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+    })
+    dragDropElem.addEventListener('dragleave', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+    })
+    dragDropElem.addEventListener('dragover', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+    })
+    dragDropElem.addEventListener('dragenter', (e) => {
+      if (!dragDropElem.contains(e.relatedTarget)) {
+        dragDropElem.querySelector('sl-animation').setAttribute('play', true)
+      }
+    })
+    dragDropElem.addEventListener('drop', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.dataTransfer.files })
+    })
+    
+    document.querySelector('.file-input').addEventListener('change', (e) => {
+      this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.target.files })
     })
   }
 
@@ -348,9 +348,16 @@ export class App {
     section.querySelector('.continue-btn').addEventListener('click', () => {
       this.stateService.send('CONTINUE')
     })
+    section.querySelector('.file-input').addEventListener('change', (e) => {
+      this.stateService.send('ADD_FILES', { fileList: e.target.files })
+    })
     this.appRoot.replaceChildren(section)
     this.appRoot.classList.add('app-content-2-col')
 
+    this.renderFiles({ fileMap })
+  }
+  
+  renderFiles({ fileMap }) {
     fileMap.forEach((value) => {
       this.renderFile(value)
       this.renderFileDetail(value)
@@ -365,7 +372,7 @@ export class App {
     })
   }
 
-  renderFile({ name, size, file }) {
+  renderFile({ size, file }) {
     const template = document.querySelector('#fileListItem')
     const listItem = template.content.cloneNode(true)
     listItem
@@ -413,6 +420,19 @@ export class App {
       })
     })
     this.appRoot.querySelector('.file-detail-list').appendChild(detail)
+    const listItem = this.appRoot.querySelector(
+      `.file-list [data-file-name="${file.name}"]`
+    )
+    listItem.querySelector('.file-info').addEventListener('click', (e) => {
+      const item = this.appRoot.querySelector(
+        `.file-detail-list [data-file-name="${file.name}"]`
+      )
+      item.scrollIntoView({ behavior: 'smooth' })
+      item.classList.add('selected')
+      window.setTimeout(() => {
+        item.classList.remove('selected')
+      }, 1000)
+    })
   }
 
   renderFileStart({ file }) {
@@ -438,16 +458,6 @@ export class App {
     )
     listItem.querySelector('.status').innerHTML =
       '<sl-icon class="icon success" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/check-circle-fill.svg"></sl-icon>'
-    listItem.querySelector('.file-info').addEventListener('click', (e) => {
-      const item = this.appRoot.querySelector(
-        `.file-detail-list [data-file-name="${file.name}"]`
-      )
-      item.scrollIntoView({ behavior: 'smooth' })
-      item.classList.add('selected')
-      window.setTimeout(() => {
-        item.classList.remove('selected')
-      }, 1000)
-    })
   }
 
   renderDeletedFile({ file }) {
