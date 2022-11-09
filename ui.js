@@ -282,38 +282,43 @@ export class App {
   }
 
   renderInitial() {
-    window.dropzone.addEventListener('drag', (e) => {
-      e.preventDefault()
-      e.stopPropagation()
+    Array.from(document.querySelectorAll('.file-drag-drop')).forEach(elem => {
+      elem.addEventListener('drag', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+      })
+      elem.addEventListener('dragstart', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+      })
+      elem.addEventListener('dragend', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+      })
+      elem.addEventListener('dragleave', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+      })
+      elem.addEventListener('dragover', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+      })
+      elem.addEventListener('dragenter', (e) => {
+        if (!elem.contains(e.relatedTarget)) {
+          elem.querySelector('sl-animation').setAttribute('play', true)
+        }
+      })
+      elem.addEventListener('drop', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.dataTransfer.files })
+      })
     })
-    window.dropzone.addEventListener('dragstart', (e) => {
-      e.preventDefault()
-      e.stopPropagation()
-    })
-    window.dropzone.addEventListener('dragend', (e) => {
-      e.preventDefault()
-      e.stopPropagation()
-    })
-    window.dropzone.addEventListener('dragleave', (e) => {
-      e.preventDefault()
-      e.stopPropagation()
-    })
-    window.dropzone.addEventListener('dragover', (e) => {
-      e.preventDefault()
-      e.stopPropagation()
-    })
-    window.dropzone.addEventListener('dragenter', (e) => {
-      if (!window.dropzone.contains(e.relatedTarget)) {
-        window.dropzone.querySelector('sl-animation').setAttribute('play', true)
-      }
-    })
-    window.dropzone.addEventListener('drop', (e) => {
-      e.preventDefault()
-      e.stopPropagation()
-      this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.dataTransfer.files })
-    })
-    window.fileInput.addEventListener('change', (e) => {
-      this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.target.files })
+
+    Array.from(document.querySelectorAll('.file-input')).forEach(elem => {
+      elem.addEventListener('change', (e) => {
+        this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.target.files })
+      })
     })
   }
 
@@ -494,7 +499,7 @@ export class App {
   }
 
   renderNoValidFiles() {
-    const dropzone = this.appRoot.querySelector('#dropzone')
+    const dropzone = this.appRoot.querySelector('.file-drag-drop')
     dropzone.classList.add('has-error')
     dropzone.querySelector('.error-message').classList.remove('hidden')
   }
