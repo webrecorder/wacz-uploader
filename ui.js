@@ -33,13 +33,6 @@ function formatFileName(fileName) {
   return fileName
 }
 
-function mapFromFileList(fileList) {
-  return new Map(
-    Array.from(fileList).map((file) => 
-      [file.name, { name: formatFileName(file.name), file }])
-  )
-}
-
 /**
  * @param {FileList} fileList
  * @returns {{ accept: FileList; reject: FileList }}
@@ -82,7 +75,10 @@ export class App {
         FILE_INPUT_CHANGE: [{
           target: 'editFileInformation',
           actions: assign({
-            fileMap: (ctx, { fileList }) => mapFromFileList(fileList),
+            fileMap: (ctx, { fileList }) => new Map(
+              Array.from(fileList).map((file) => 
+                [file.name, { name: formatFileName(file.name), file }])
+            ),
           }),
           cond: (ctx, evt) => filesByAccept(evt.fileList).accept.length > 0,
         }, {
@@ -99,15 +95,16 @@ export class App {
           actions: [
             assign({
               fileMap: (ctx, { fileList }) => {
-                return new Map([
-                  ...ctx.fileMap,
-                  ...mapFromFileList(fileList)
-                ])
+                [...fileList].forEach(file => {
+                  ctx.fileMap.set(file.name, {
+                    name: formatFileName(file.name),
+                    file,
+                  })
+                })
+                return ctx.fileMap
               },
             }),
-            (ctx, evt) => this.renderFiles({
-              fileMap: mapFromFileList(evt.fileList),
-            }),
+            (ctx, evt) => this.renderFiles(ctx),
           ],
         },
         REMOVE_FILE: [{
@@ -359,9 +356,15 @@ export class App {
   
   renderFiles({ fileMap }) {
     fileMap.forEach((value) => {
-      this.renderFile(value)
-      this.renderFileDetail(value)
+      const listItem = this.appRoot.querySelector(
+        `.file-list [data-file-name="${value.file.name}"]`
+      )
 
+      if (!listItem) {
+        this.renderFile(value)
+        this.renderFileDetail(value)
+      }
+  
       if (value.error) {
         this.renderFileError(value)
       } else if (value.url) {
@@ -465,7 +468,7 @@ export class App {
       `[data-file-name="${file.name}"]`
     )
     Array.from(items).forEach((item) => {
-      item.classList.add('hidden')
+      item.parentNode.removeChild(item)
     })
   }
 
