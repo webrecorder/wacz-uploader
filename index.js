@@ -1,7 +1,6 @@
 /* global localStorage */
 import { ArchiveWrapper } from './archivewrapper.js'
 import { create } from 'auto-js-ipfs'
-import { WEB3_STORAGE_TOKEN } from './config.js'
 import { App } from './ui.js'
 
 const PERSIST_KEY = 'wacz-archives'
@@ -9,7 +8,7 @@ const PERSIST_KEY = 'wacz-archives'
 log('Initializing IPFS')
 
 const { api: ipfs } = await create({
-  web3StorageToken: WEB3_STORAGE_TOKEN
+  web3StorageToken: __define__.PUBLIC_WEB3_STORAGE_TOKEN
 })
 
 const wrapper = new ArchiveWrapper({
