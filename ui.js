@@ -10,16 +10,16 @@ import {
 // Context stored in app state
 const initialContext = {
   /**
-   * Files metadata
+   * Web archive files to upload
    * Mapped by original file name (ID)
    * @type {Map<string,{
    *   name: string;
    *   description: string;
-   *   url: string;
    *   size: number;
    *   file: File;
-   *   rejected: boolean;
-   *   completed: boolean;
+   *   isUploading: boolean;
+   *   error: Error;
+   *   url: string;
    * }>}
    */
   fileMap: new Map(),
@@ -27,6 +27,28 @@ const initialContext = {
 
 function formatFileName(fileName) {
   return fileName.slice(0, fileName.lastIndexOf('.'))
+}
+
+/**
+ * @param {FileList} fileList
+ * @returns {{ accept: FileList; reject: FileList }}
+ */
+function filesByAccept(fileList) {
+  const acceptList = new DataTransfer();
+  const rejectList = new DataTransfer();
+  Array.from(fileList).forEach((file) => {
+    const { name, type } = file;
+    if (/\.wa(cz|rc)$/.test(name) || /\/wa(cz|rc)$/.test(type)) {
+      acceptList.items.add(file);
+    } else {
+      rejectList.items.add(file);
+    }
+  });
+
+  return {
+    accept: acceptList.files,
+    reject: rejectList.files,
+  };
 }
 
 export class App {
@@ -46,37 +68,34 @@ export class App {
         },
       },
       on: {
-        NO_VALID_FILES_SELECTED: '.noValidFiles',
-        UPLOAD_FILE_LIST_START: {
-          target: 'uploadingFileList',
+        FILE_INPUT_CHANGE: [{
+          target: 'editFileInformation',
           actions: assign({
             fileMap: (ctx, { fileList }) =>
               new Map(
-                fileList.map((file) => [file.name, { name: formatFileName(file.name), file }])
+                Array.from(fileList).map((file) => 
+                  [file.name, { name: formatFileName(file.name), file }])
               ),
           }),
-        },
+          cond: (ctx, evt) => filesByAccept(evt.fileList).accept.length > 0,
+        }, {
+          target: '.noValidFiles',
+          cond: (ctx, evt) => !filesByAccept(evt.fileList).accept.length,
+        }],
       },
     },
-    uploadingFileList: {
-      id: 'uploadingFileList',
-      entry: (ctx) => this.renderUploading(ctx),
-      states: {
-        finished: {
-          entry: () => this.enableContinueBtn(),
-          on: {
-            CONTINUE: [{
-              target: '#incompleteFileListUpload',
-              cond: (ctx) => [...ctx.fileMap.values()].some(({ rejected }) => rejected),
-            }, {
-              target: '#creatingSite.uploading',
-              cond: (ctx) => ![...ctx.fileMap.values()].some(({ rejected }) => rejected),
-            }],
-          },
-        },
-      },
+    editFileInformation: {
+      id: 'editFileInformation',
+      entry: (ctx) => this.renderFileInformation(ctx),
       on: {
-        REMOVE_FILE: {
+        REMOVE_FILE: [{
+          // target: 'initial',
+          actions: () => {
+            // TODO transition to initial
+            window.location.reload()
+          },
+          cond: (ctx) => ctx.fileMap.size === 1,
+        }, {
           actions: [
             assign({
               fileMap: (ctx, { file }) => {
@@ -86,7 +105,8 @@ export class App {
             }),
             (ctx, evt) => this.renderDeletedFile(evt),
           ],
-        },
+          cond: (ctx) => ctx.fileMap.size > 1,
+        }],
         UPDATE_FILE_NAME: {
           actions: [
             assign({
@@ -111,109 +131,93 @@ export class App {
             },
           }),
         },
-        FILE_UPLOAD_START: {
-          actions: (ctx, evt) => this.renderFileStart(evt),
-        },
-        FILE_UPLOAD_ERROR: {
-          actions: [
-            assign({
-              fileMap: (ctx, { file }) => {
-                const data = ctx.fileMap.get(file.name)
-                ctx.fileMap.set(file.name, { ...data, rejected: true })
-                return ctx.fileMap
-              },
-            }),
-            (ctx, evt) => this.renderFileError(evt),
-          ],
-        },
-        FILE_UPLOAD_SUCCESS: {
-          actions: [
-            assign({
-              fileMap: (ctx, { file }) => {
-                const data = ctx.fileMap.get(file.name)
-                ctx.fileMap.set(file.name, { ...data, completed: true })
-                return ctx.fileMap
-              },
-            }),
-            ({ fileMap }, { file }) => {
-              const data = fileMap.get(file.name)
-              this.renderFileSuccess(data)
-              this.renderFileDetail(data)
-            },
-          ],
-        },
-        UPLOAD_FILE_LIST_ERROR: {
-          actions: (ctx, evt) => this.renderErrorMessage(evt),
-        },
-        UPLOAD_FILE_LIST_FINISH: {
-          target: '.finished',
-          actions: [
-            assign({
-              fileMap: (ctx, { completed }) => {
-                const map = new Map(completed)
-                map.forEach((value, key) => {
-                  const { name, ...ctxValue } = ctx.fileMap.get(key)
-                  map.set(key, { ...ctxValue, ...value, name })
-                })
-                return map
-              },
-            }),
-            () => this.renderDoneLoadingDetails(),
-          ],
-        },
+        CONTINUE: 'creatingSite.uploadingFiles',
       },
     },
     incompleteFileListUpload: {
       id: 'incompleteFileListUpload',
       entry: () => this.renderIncompleteWarning(),
       on: {
-        BACK: {
-          target: 'uploadingFileList.finished',
-        },
-        CONTINUE: {
-          target: 'creatingSite.uploading',
-          
-        },
+        BACK: 'editFileInformation',
+        CONTINUE: 'creatingSite.uploadingSite',
       },
     },
     creatingSite: {
       id: 'creatingSite',
+      entry: () => this.renderCreatingSite(),
       states: {
-        uploading: {
-          entry: [
-            (ctx) => this.uploadSite(ctx),
-            () => this.renderCreatingSite(),
-          ],
+        uploadingFiles: {
+          entry: (ctx) => this.uploadFiles(ctx),
+          on: {
+            UPLOAD_FILE_LIST_START: {
+              actions: () => this.renderCreatingSiteStatusMessage({
+                message: 'Starting upload...'
+              }),
+            },
+            UPLOAD_FILE_LIST_FINISH: [{
+              target: '#incompleteFileListUpload',
+              cond: (ctx, evt) => evt.rejected && evt.rejected.size,
+            }, {
+              target: 'uploadingSite',
+              cond: (ctx, evt) => !evt.rejected || !evt.rejected.size,
+            }],
+            FILE_UPLOAD_START: {
+              actions: assign({
+                fileMap: (ctx, { file }) => {
+                  const data = ctx.fileMap.get(file.name)
+                  ctx.fileMap.set(file.name, { ...data, isUploading: true })
+                  return ctx.fileMap
+                },
+              }),
+            },
+            FILE_UPLOAD_ERROR: {
+              actions: assign({
+                fileMap: (ctx, { file, error }) => {
+                  const data = ctx.fileMap.get(file.name)
+                  ctx.fileMap.set(file.name, { ...data, error })
+                  return ctx.fileMap
+                },
+              }),
+            },
+            FILE_UPLOAD_SUCCESS: {
+              actions: assign({
+                fileMap: (ctx, { file, url }) => {
+                  const data = ctx.fileMap.get(file.name)
+                  ctx.fileMap.set(file.name, { ...data, url })
+                  return ctx.fileMap
+                },
+              }),
+            },
+          },
         },
-        error: {
+        uploadingSite: {
+          entry: (ctx) => this.uploadSite(ctx),
+          on: {
+            UPLOAD_SITE_START: {
+              actions: () => this.renderCreatingSiteStatusMessage({
+                message: 'Uploading site to IPFS...'
+              }),
+            },
+            UPLOAD_SITE_METADATA_START: {
+              actions: () => this.renderCreatingSiteStatusMessage({
+                message: 'Almost done...'
+              }),
+            },
+            UPLOAD_SITE_ERROR: 'siteUploadError',
+            UPLOAD_SITE_FINISH: '#done',
+          },
+        },
+        siteUploadError: {
           entry: (ctx, evt) => this.renderCreatingSiteError(evt),
           on: {
-            BACK: '#uploadingFileList.finished',
-            RETRY: 'uploading',
+            BACK: '#editFileInformation',
+            RETRY: '#creatingSite.uploadingSite',
           },
         },
       },
-      on: {
-        FILE_UPLOAD_START: {
-          actions: () => this.renderCreatingSiteStatusMessage({
-            message: 'Uploading site to IPFS...'
-          }),
-        },
-        FILE_UPLOAD_METADATA_START: {
-          actions: () => this.renderCreatingSiteStatusMessage({
-            message: 'Getting website metadata...'
-          }),
-        },
-        FILE_UPLOAD_SUCCESS: {
-          actions: () => this.renderCreatingSiteStatusMessage({
-            message: 'Almost done...'
-          }),
-        },
-        UPLOAD_SITE_ERROR: '.error',
-        UPLOAD_SITE_FINISH: 'done',
-      },
     },
     done: {
+      id: 'done',
       type: 'final',
       entry: (ctx, evt) => this.renderDone(evt),
       // on: {
@@ -238,14 +242,10 @@ export class App {
       .onTransition((state) => console.debug(state.value))
       .start()
     this.wrapperService = {
+      uploadFiles: (...args) => wrapper.uploadFiles(...args),
       uploadWrappedArchives: (...args) => wrapper.uploadWrappedArchives(...args),
-      uploadFromDropEvent: (...args) => wrapper.uploadFromDropEvent(...args),
-      uploadFromFileInputEvent: (...args) => wrapper.uploadFromFileInputEvent(...args),
     }
     
-    wrapper.addEventListener('novalidfiles', (evt) =>
-      this.stateService.send('NO_VALID_FILES_SELECTED', evt)
-    )
     wrapper.addEventListener('uploadfilestart', (evt) =>
       this.stateService.send('FILE_UPLOAD_START', evt)
     )
@@ -269,6 +269,9 @@ export class App {
     )
     wrapper.addEventListener('uploadsitestart', (evt) =>
       this.stateService.send('UPLOAD_SITE_START', evt)
+    )
+    wrapper.addEventListener('uploadsitemetadatastart', (evt) =>
+      this.stateService.send('UPLOAD_SITE_METADATA_START', evt)
     )
     wrapper.addEventListener('uploadsitefinish', (evt) =>
       this.stateService.send('UPLOAD_SITE_FINISH', evt)
@@ -307,27 +310,32 @@ export class App {
     window.dropzone.addEventListener('drop', (e) => {
       e.preventDefault()
       e.stopPropagation()
-      this.wrapperService.uploadFromDropEvent(e)
+      this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.dataTransfer.files })
     })
     window.fileInput.addEventListener('change', (e) => {
-      this.wrapperService.uploadFromFileInputEvent(e)
+      this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.target.files })
     })
   }
 
-  renderUploading({ fileMap }) {
+  renderFileInformation({ fileMap }) {
     const template = document.querySelector('#uploadProgressScreen')
     const section = template.content.cloneNode(true)
+    section.querySelector('.continue-btn').addEventListener('click', () => {
+      this.stateService.send('CONTINUE')
+    })
     this.appRoot.replaceChildren(section)
     this.appRoot.classList.add('app-content-2-col')
 
     fileMap.forEach((value) => {
       this.renderFile(value)
+      this.renderFileDetail(value)
 
-      if (value.rejected) {
+      if (value.error) {
         this.renderFileError(value)
-      } else if (value.completed) {
+      } else if (value.url) {
         this.renderFileSuccess(value)
-        this.renderFileDetail(value)
+      } else if (value.isUploading) {
+        this.renderFileStart(value)
       }
     })
   }
@@ -346,17 +354,8 @@ export class App {
     })
     this.appRoot.querySelector('.file-list').appendChild(listItem)
   }
-  
-  renderDoneLoadingDetails() {
-    const loadingIndicator = this.appRoot.querySelector('.file-details-loading')
-    if (loadingIndicator) {
-      loadingIndicator.parentNode.removeChild(loadingIndicator)
-    }
-  }
 
   renderFileDetail({ name, description, file }) {
-    this.renderDoneLoadingDetails()
-
     const template = document.querySelector('#fileDetailItem')
     const detail = template.content.cloneNode(true)
     const textarea = detail.querySelector('textarea')
@@ -508,12 +507,10 @@ export class App {
     }
   }
 
-  enableContinueBtn() {
-    const btn = this.appRoot.querySelector('.continue-btn')
-    btn.addEventListener('click', () => {
-      this.stateService.send('CONTINUE')
-    })
-    btn.removeAttribute('disabled')
+  uploadFiles({ fileMap }) {
+    console.debug('upload files:', fileMap)
+    const fileList = Array.from(fileMap.values()).map(({ file }) => file)
+    this.wrapperService.uploadFiles(fileList)
   }
 
   uploadSite({ fileMap }) {
