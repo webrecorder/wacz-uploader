@@ -21,8 +21,11 @@
         </h2>
       </div>
       <div class="card-body">
-        <p class="text">Create an interactive, publicly accessible collection of archived webpages. The generated gallery will be available immediately in your browser, and in the browsers of tomorrow with IPFS — a peer-to-peer protocol that delivers files based on their contents.</p>
-        <p class="text">Never archived a website before? Try it with <a class="primary" href="https://express.archiveweb.page" target="_blank">ArchiveWeb.Page</a>!</p>
+        <p class="text">Create an interactive, publicly accessible collection of archived webpages. The generated gallery will
+          be available immediately in your browser, and in the browsers of tomorrow with IPFS — a peer-to-peer protocol that
+          delivers files based on their contents.</p>
+        <p class="text">Never archived a website before? Try it with
+          <a class="primary" href="https://express.archiveweb.page" target="_blank">ArchiveWeb.Page</a>!</p>
       </div>
       <div class="card-footer help-text">
         <a class="secondary" href="https://github.com/webrecorder/wacz-uploader" target="_blank" rel="noreferrer noopener">
@@ -31,12 +34,14 @@
         </a>
         <a class="secondary" href="https://github.com/webrecorder/wacz-uploader" target="_blank" rel="noreferrer noopener">
           <span class="label">Source code</span>
-          <sl-icon class="icon" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/github.svg"></sl-icon>
+          <sl-icon
+            class="icon"
+            src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/github.svg"></sl-icon>
         </a>
       </div>
     </div>
     <div class="file-upload-container">
-      <label id="dropzone">
+      <label id="dropzone" class="file-drag-drop">
         <svg
           class="file-upload-border"
           xmlns="http://www.w3.org/2000/svg"
@@ -64,13 +69,12 @@
               <p class="error-message hidden">
                 No valid web archive files selected.
               </p>
-
               Click here or drop some files.
             </div>
             <p class="help-text">
               Multiple .wacz files will be combined into a single browsable collection, 100MB size limit per file.
             </p>
-            <input type="file" id="fileInput" multiple accept=".wacz,.warc"/>
+            <input type="file" class="file-input" multiple accept=".wacz,.warc"/>
           </div>
         </sl-animation>
       </label>
@@ -100,7 +104,12 @@
       </div>
     </div>
     <div class="card-footer">
-      <div class="error-message"></div>
+      <div>
+        <label class="file-input-label">
+          Add more files <input type="file" class="file-input" multiple accept=".wacz,.warc"/>
+        </label>
+        <div class="error-message"></div>
+      </div>
       <button class="continue-btn primary" autocomplete="false">Continue</button>
     </div>
   </section>

@@ -26,7 +26,11 @@ const initialContext = {
 }
 
 function formatFileName(fileName) {
-  return fileName.slice(0, fileName.lastIndexOf('.'))
+  const idx = fileName.lastIndexOf('.')
+  if (idx > -1) {
+    return fileName.slice(0, fileName.lastIndexOf('.'))
+  }
+  return fileName
 }
 
 /**
@@ -71,11 +75,10 @@ export class App {
         FILE_INPUT_CHANGE: [{
           target: 'editFileInformation',
           actions: assign({
-            fileMap: (ctx, { fileList }) =>
-              new Map(
-                Array.from(fileList).map((file) => 
-                  [file.name, { name: formatFileName(file.name), file }])
-              ),
+            fileMap: (ctx, { fileList }) => new Map(
+              Array.from(fileList).map((file) => 
+                [file.name, { name: formatFileName(file.name), file }])
+            ),
           }),
           cond: (ctx, evt) => filesByAccept(evt.fileList).accept.length > 0,
         }, {
@@ -88,6 +91,22 @@ export class App {
       id: 'editFileInformation',
       entry: (ctx) => this.renderFileInformation(ctx),
       on: {
+        ADD_FILES: {
+          actions: [
+            assign({
+              fileMap: (ctx, { fileList }) => {
+                [...fileList].forEach(file => {
+                  ctx.fileMap.set(file.name, {
+                    name: formatFileName(file.name),
+                    file,
+                  })
+                })
+                return ctx.fileMap
+              },
+            }),
+            (ctx, evt) => this.renderFiles(ctx),
+          ],
+        },
         REMOVE_FILE: [{
           // target: 'initial',
           actions: () => {
@@ -282,37 +301,40 @@ export class App {
   }
 
   renderInitial() {
-    window.dropzone.addEventListener('drag', (e) => {
+    const dragDropElem = this.appRoot.querySelector('.file-drag-drop')
+
+    dragDropElem.addEventListener('drag', (e) => {
       e.preventDefault()
       e.stopPropagation()
     })
-    window.dropzone.addEventListener('dragstart', (e) => {
+    dragDropElem.addEventListener('dragstart', (e) => {
       e.preventDefault()
       e.stopPropagation()
     })
-    window.dropzone.addEventListener('dragend', (e) => {
+    dragDropElem.addEventListener('dragend', (e) => {
       e.preventDefault()
       e.stopPropagation()
     })
-    window.dropzone.addEventListener('dragleave', (e) => {
+    dragDropElem.addEventListener('dragleave', (e) => {
       e.preventDefault()
       e.stopPropagation()
     })
-    window.dropzone.addEventListener('dragover', (e) => {
+    dragDropElem.addEventListener('dragover', (e) => {
       e.preventDefault()
       e.stopPropagation()
     })
-    window.dropzone.addEventListener('dragenter', (e) => {
-      if (!window.dropzone.contains(e.relatedTarget)) {
-        window.dropzone.querySelector('sl-animation').setAttribute('play', true)
+    dragDropElem.addEventListener('dragenter', (e) => {
+      if (!dragDropElem.contains(e.relatedTarget)) {
+        dragDropElem.querySelector('sl-animation').setAttribute('play', true)
       }
     })
-    window.dropzone.addEventListener('drop', (e) => {
+    dragDropElem.addEventListener('drop', (e) => {
       e.preventDefault()
       e.stopPropagation()
       this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.dataTransfer.files })
     })
-    window.fileInput.addEventListener('change', (e) => {
+    
+    document.querySelector('.file-input').addEventListener('change', (e) => {
       this.stateService.send('FILE_INPUT_CHANGE', { fileList: e.target.files })
     })
   }
@@ -323,13 +345,26 @@ export class App {
     section.querySelector('.continue-btn').addEventListener('click', () => {
       this.stateService.send('CONTINUE')
     })
+    section.querySelector('.file-input').addEventListener('change', (e) => {
+      this.stateService.send('ADD_FILES', { fileList: e.target.files })
+    })
     this.appRoot.replaceChildren(section)
     this.appRoot.classList.add('app-content-2-col')
 
+    this.renderFiles({ fileMap })
+  }
+  
+  renderFiles({ fileMap }) {
     fileMap.forEach((value) => {
-      this.renderFile(value)
-      this.renderFileDetail(value)
+      const listItem = this.appRoot.querySelector(
+        `.file-list [data-file-name="${value.file.name}"]`
+      )
 
+      if (!listItem) {
+        this.renderFile(value)
+        this.renderFileDetail(value)
+      }
+  
       if (value.error) {
         this.renderFileError(value)
       } else if (value.url) {
@@ -340,7 +375,7 @@ export class App {
     })
   }
 
-  renderFile({ name, size, file }) {
+  renderFile({ size, file }) {
     const template = document.querySelector('#fileListItem')
     const listItem = template.content.cloneNode(true)
     listItem
@@ -388,6 +423,19 @@ export class App {
       })
     })
     this.appRoot.querySelector('.file-detail-list').appendChild(detail)
+    const listItem = this.appRoot.querySelector(
+      `.file-list [data-file-name="${file.name}"]`
+    )
+    listItem.querySelector('.file-info').addEventListener('click', (e) => {
+      const item = this.appRoot.querySelector(
+        `.file-detail-list [data-file-name="${file.name}"]`
+      )
+      item.scrollIntoView({ behavior: 'smooth' })
+      item.classList.add('selected')
+      window.setTimeout(() => {
+        item.classList.remove('selected')
+      }, 1000)
+    })
   }
 
   renderFileStart({ file }) {
@@ -413,16 +461,6 @@ export class App {
     )
     listItem.querySelector('.status').innerHTML =
       '<sl-icon class="icon success" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.83/dist/assets/icons/check-circle-fill.svg"></sl-icon>'
-    listItem.querySelector('.file-info').addEventListener('click', (e) => {
-      const item = this.appRoot.querySelector(
-        `.file-detail-list [data-file-name="${file.name}"]`
-      )
-      item.scrollIntoView({ behavior: 'smooth' })
-      item.classList.add('selected')
-      window.setTimeout(() => {
-        item.classList.remove('selected')
-      }, 1000)
-    })
   }
 
   renderDeletedFile({ file }) {
@@ -430,7 +468,7 @@ export class App {
       `[data-file-name="${file.name}"]`
     )
     Array.from(items).forEach((item) => {
-      item.classList.add('hidden')
+      item.parentNode.removeChild(item)
     })
   }
 
@@ -494,7 +532,7 @@ export class App {
   }
 
   renderNoValidFiles() {
-    const dropzone = this.appRoot.querySelector('#dropzone')
+    const dropzone = this.appRoot.querySelector('.file-drag-drop')
     dropzone.classList.add('has-error')
     dropzone.querySelector('.error-message').classList.remove('hidden')
   }
