@@ -10,7 +10,7 @@
     "lint": "standard --fix",
     "build": "NODE_ENV=production node scripts/build.js",
     "serve": "wds --node-resolve --open --watch",
-    "dev": "rm bundle.js && concurrently \"node scripts/build.js --watch\" \"wait-on bundle.js && npm run serve\""
+    "dev": "rimraf bundle.js && concurrently \"node scripts/build.js --watch\" \"wait-on bundle.js && npm run serve\""
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
     "concurrently": "^7.4.0",
     "dotenv": "^16.0.3",
     "esbuild": "^0.15.10",
+    "rimraf": "^3.0.2",
     "standard": "^17.0.0",
     "wait-on": "^6.0.1"
   },
